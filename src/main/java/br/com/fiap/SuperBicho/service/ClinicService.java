@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.*;
 import org.springframework.data.domain.*;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -13,6 +14,7 @@ import org.springframework.web.server.ResponseStatusException;
 public class ClinicService {
 
     private final ClinicRepository clinicRepository;
+    private final PasswordEncoder passwordEncoder;
 
     @Cacheable("clinics")
     public Page<Clinic> findAll(Pageable pageable) {
@@ -23,7 +25,9 @@ public class ClinicService {
         return clinicRepository.findById(id).orElseThrow(() -> notFound()); }
 
     @CacheEvict(value = {"clinics", "clinicById", "appointments", "appointmentById"}, allEntries = true)
-    public Clinic create(Clinic clinic) { return clinicRepository.save(clinic); }
+    public Clinic create(Clinic clinic) {
+        clinic.setPassword(passwordEncoder.encode(clinic.getPassword()));
+        return clinicRepository.save(clinic); }
 
     @CacheEvict(value = {"clinics", "clinicById", "appointments", "appointmentById"}, allEntries = true)
 

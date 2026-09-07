@@ -1,0 +1,12 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head><meta charset="UTF-8"><title>SuperBicho - Login</title></head>
+<body>
+<h1>Login - Tutor</h1>
+<form th:action="@{/login}" method="post">
+    <label>Email: <input type="text" name="username" required></label><br>
+    <label>Senha: <input type="password" name="password" required></label><br>
+    <button type="submit">Entrar</button>
+</form>
+</body>
+</html>

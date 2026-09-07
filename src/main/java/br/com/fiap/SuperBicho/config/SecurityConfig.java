@@ -34,15 +34,15 @@ public class SecurityConfig {
     @Bean
     @Order(1)
     public SecurityFilterChain adminFilterChain(HttpSecurity http) throws Exception {
-        http.securityMatcher("/admin/**")
+        http.securityMatcher("/adm/**")
                 .authenticationProvider(providerFor(adminUserDetailsService))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/admin/login").permitAll()
+                        .requestMatchers("/adm/login").permitAll()
                         .anyRequest().hasRole("ADMIN"))
                 .formLogin(form -> form
-                        .loginPage("/admin/login")
-                        .loginProcessingUrl("/admin/login")   // <- adiciona essa linha
-                        .defaultSuccessUrl("/admin/home", true)
+                        .loginPage("/adm/login")
+                        .loginProcessingUrl("/adm/login")
+                        .defaultSuccessUrl("/adm/home", true)
                         .permitAll());
         return http.build();
     }
@@ -58,7 +58,7 @@ public class SecurityConfig {
                         .anyRequest().hasRole("CLINICA_APPROVED"))
                 .formLogin(form -> form
                         .loginPage("/clinica/login")
-                        .loginProcessingUrl("/clinica/login") // <- adiciona essa linha
+                        .loginProcessingUrl("/clinica/login") //
                         .defaultSuccessUrl("/clinica/status", true)
                         .permitAll());
         return http.build();
@@ -74,6 +74,7 @@ public class SecurityConfig {
                         .anyRequest().hasRole("TUTOR"))
                 .formLogin(form -> form
                         .loginPage("/login")
+                        .loginProcessingUrl("/login")
                         .defaultSuccessUrl("/home", true)
                         .permitAll());
         return http.build();

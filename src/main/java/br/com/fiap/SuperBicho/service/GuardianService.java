@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.*;
 import org.springframework.data.domain.*;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -14,6 +15,9 @@ import org.springframework.web.server.ResponseStatusException;
 public class GuardianService {
 
     private final GuardianRepository guardianRepository;
+    private final PasswordEncoder passwordEncoder;
+
+
 
     @Cacheable("guardians")
     public Page<Guardian> findAll(Pageable pageable) {
@@ -24,7 +28,9 @@ public class GuardianService {
         return guardianRepository.findById(id).orElseThrow(() -> notFound()); }
 
     @CacheEvict(value = {"guardians", "guardianById", "animals", "animalById"}, allEntries = true)
-    public Guardian create(Guardian guardian) { return guardianRepository.save(guardian); }
+    public Guardian create(Guardian guardian){
+    guardian.setPassword(passwordEncoder.encode(guardian.getPassword()));
+     return guardianRepository.save(guardian); }
 
     @CacheEvict(value = {"guardians", "guardianById", "animals", "animalById"}, allEntries = true)
     public Guardian update(Integer id, Guardian updatedGuardian) { Guardian guardian = findById(id);
