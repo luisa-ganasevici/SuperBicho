@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>SuperBicho - Cadastro Clínica</title>
+</head>
+<body>
+<h1>Cadastro - Clínica</h1>
+<form th:action="@{/clinica/cadastro}" th:object="${clinic}" method="post">
+    <label>Nome da clínica:
+        <input type="text" th:field="*{name}">
+    </label>
+    <p th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></p>
+    <br>
+
+    <label>Endereço:
+        <input type="text" th:field="*{address}">
+    </label>
+    <p th:if="${#fields.hasErrors('address')}" th:errors="*{address}"></p>
+    <br>
+
+    <label>Telefone:
+        <input type="text" th:field="*{phone}">
+    </label>
+    <p th:if="${#fields.hasErrors('phone')}" th:errors="*{phone}"></p>
+    <br>
+
+    <label>Email:
+        <input type="text" th:field="*{email}">
+    </label>
+    <p th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></p>
+    <br>
+
+    <label>Senha:
+        <input type="password" th:field="*{password}">
+    </label>
+    <p th:if="${#fields.hasErrors('password')}" th:errors="*{password}"></p>
+    <br>
+
+    <button type="submit">Cadastrar</button>
+</form>
+</body>
+</html>

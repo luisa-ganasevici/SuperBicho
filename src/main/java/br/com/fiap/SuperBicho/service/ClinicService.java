@@ -1,6 +1,7 @@
 package br.com.fiap.SuperBicho.service;
 
 import br.com.fiap.SuperBicho.entity.Clinic;
+import br.com.fiap.SuperBicho.entity.ClinicStatus;
 import br.com.fiap.SuperBicho.repository.ClinicRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.*;
@@ -27,6 +28,7 @@ public class ClinicService {
     @CacheEvict(value = {"clinics", "clinicById", "appointments", "appointmentById"}, allEntries = true)
     public Clinic create(Clinic clinic) {
         clinic.setPassword(passwordEncoder.encode(clinic.getPassword()));
+        clinic.setClinicStatus(ClinicStatus.PENDING);
         return clinicRepository.save(clinic); }
 
     @CacheEvict(value = {"clinics", "clinicById", "appointments", "appointmentById"}, allEntries = true)

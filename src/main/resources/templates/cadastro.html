@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>SuperBicho - Cadastro</title>
+</head>
+<body>
+<h1>Cadastro - Tutor</h1>
+<form th:action="@{/cadastro}" th:object="${guardian}" method="post">
+    <label>Nome:
+        <input type="text" th:field="*{name}">
+    </label>
+    <p th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></p>
+    <br>
+
+    <label>Email:
+        <input type="text" th:field="*{email}">
+    </label>
+    <p th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></p>
+    <br>
+
+    <label>Senha:
+        <input type="password" th:field="*{password}">
+    </label>
+    <p th:if="${#fields.hasErrors('password')}" th:errors="*{password}"></p>
+    <br>
+
+    <button type="submit">Cadastrar</button>
+</form>
+</body>
+</html>
