@@ -7,7 +7,10 @@ import lombok.*;
 
 @Entity
 @Table(name = "SB_TB_GUARDIAN")
-@Getter @Setter @NoArgsConstructor @AllArgsConstructor
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class Guardian {
 
     @Id
@@ -24,7 +27,5 @@ public class Guardian {
     @NotBlank(message = "É necessario informar a senha") @Size(min = 4, message = "É necessario que a senha tenha no minimo 4 caracteres")
     private String password;
 
-    @NotBlank(message = "É necessario informar o tipo de usuario")
-    private String userType;
 
 }

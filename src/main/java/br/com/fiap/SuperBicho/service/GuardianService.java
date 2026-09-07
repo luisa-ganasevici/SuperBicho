@@ -9,7 +9,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
-@Service @RequiredArgsConstructor
+@Service
+@RequiredArgsConstructor
 public class GuardianService {
 
     private final GuardianRepository guardianRepository;
@@ -30,7 +31,6 @@ public class GuardianService {
         guardian.setName(updatedGuardian.getName());
         guardian.setEmail(updatedGuardian.getEmail());
         guardian.setPassword(updatedGuardian.getPassword());
-        guardian.setUserType(updatedGuardian.getUserType());
         return guardianRepository.save(guardian); }
 
     @CacheEvict(value = {"guardians", "guardianById", "animals", "animalById"}, allEntries = true)

@@ -2,7 +2,10 @@ package br.com.fiap.SuperBicho.dto;
 
 import lombok.*;
 
-@Getter @Setter @NoArgsConstructor @AllArgsConstructor
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class LoginResponse {
 
     private Integer id;
@@ -11,6 +14,5 @@ public class LoginResponse {
 
     private String email;
 
-    private String userType;
 
 }

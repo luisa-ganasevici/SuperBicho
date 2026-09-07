@@ -20,6 +20,6 @@ public class LoginService {
         if (!guardian.getPassword().equals(loginDTO.getPassword()))
             throw new UserNotFoundException("Email or password is incorrect");
 
-        return new LoginResponse(guardian.getId(), guardian.getName(), guardian.getEmail(), guardian.getUserType());
+        return new LoginResponse(guardian.getId(), guardian.getName(), guardian.getEmail());
     }
 }

@@ -1,6 +1,8 @@
 package br.com.fiap.SuperBicho.entity;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import lombok.*;
 
@@ -21,4 +23,16 @@ public class Clinic {
 
     @NotBlank(message = "É necessario informar o numero de telefone")
     private String phone;
+
+    @Email(message = "Email inválido")
+    @NotBlank(message = "É necessario informar o email")
+    private String email;
+
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+    @NotBlank(message = "É necessario informar senha")
+    private String password;
+
+    @Enumerated(EnumType.STRING)
+    private ClinicStatus clinicStatus;
+
 }

@@ -6,7 +6,10 @@ import lombok.*;
 
 @Entity
 @Table(name = "SB_TB_APPOINTMENT")
-@Getter @Setter @NoArgsConstructor @AllArgsConstructor
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class Appointment {
 
     @Id

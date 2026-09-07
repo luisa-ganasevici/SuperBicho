@@ -3,7 +3,10 @@ package br.com.fiap.SuperBicho.dto;
 import jakarta.validation.constraints.*;
 import lombok.*;
 
-@Getter @Setter @NoArgsConstructor @AllArgsConstructor
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class LoginDTO {
 
     @Email(message = "Email inválido") @NotBlank(message = "É preciso informar um email") private String email;

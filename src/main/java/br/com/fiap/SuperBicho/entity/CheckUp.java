@@ -6,7 +6,10 @@ import lombok.*;
 
 @Entity
 @Table(name = "SB_TB_CHECK_UP")
-@Getter @Setter @NoArgsConstructor @AllArgsConstructor
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class CheckUp {
 
     @Id

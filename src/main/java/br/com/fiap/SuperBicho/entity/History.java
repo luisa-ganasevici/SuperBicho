@@ -6,7 +6,10 @@ import lombok.*;
 
 @Entity
 @Table(name = "SB_TB_HISTORY")
-@Getter @Setter @NoArgsConstructor @AllArgsConstructor
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class History {
 
     @Id
