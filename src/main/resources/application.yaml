@@ -5,6 +5,12 @@ spring:
   application:
     name: SuperBicho
 
+  security:
+    user:
+        name: admin
+        password: senha123
+        roles: ADMIN
+
   datasource:
     url: jdbc:oracle:thin:@oracle.fiap.com.br:1521:orcl
     username: rm563403

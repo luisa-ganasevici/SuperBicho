@@ -13,10 +13,10 @@ public class Appointment {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @NotBlank(message = "É preciso informar a data")
+    @Column(name = "appointment_date")
     private String date;
 
-    @NotBlank(message = "É preciso informar horario")
+    @Column(name = "appointment_time")
     private String time;
 
     @NotBlank(message = "É preciso informar o status")
