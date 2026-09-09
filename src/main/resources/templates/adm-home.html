@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>SuperBicho - Painel Admin</title>
+</head>
+<body>
+<h1>Clínicas pendentes de aprovação</h1>
+
+<p th:if="${#lists.isEmpty(clinics)}">Nenhuma clínica pendente no momento.</p>
+
+<table th:unless="${#lists.isEmpty(clinics)}" border="1">
+    <tr>
+        <th>Nome</th>
+        <th>Endereço</th>
+        <th>Telefone</th>
+        <th>Email</th>
+        <th>Ações</th>
+    </tr>
+    <tr th:each="clinic : ${clinics}">
+        <td th:text="${clinic.name}"></td>
+        <td th:text="${clinic.address}"></td>
+        <td th:text="${clinic.phone}"></td>
+        <td th:text="${clinic.email}"></td>
+        <td>
+            <form th:action="@{/adm/approve/{id}(id=${clinic.id})}" method="post" style="display:inline">
+                <button type="submit">Aprovar</button>
+            </form>
+            <form th:action="@{/adm/deny/{id}(id=${clinic.id})}" method="post" style="display:inline">
+                <button type="submit">Recusar</button>
+            </form>
+        </td>
+    </tr>
+</table>
+
+</body>
+</html>

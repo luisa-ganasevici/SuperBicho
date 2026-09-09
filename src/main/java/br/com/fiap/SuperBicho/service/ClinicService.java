@@ -11,6 +11,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.List;
+
 @Service @RequiredArgsConstructor
 public class ClinicService {
 
@@ -51,5 +53,21 @@ public class ClinicService {
 
     public Clinic findByEmail(String email) {
         return clinicRepository.findByEmail(email).orElseThrow(() -> notFound());
+    }
+
+    public List<Clinic> findPending() {
+        return clinicRepository.findByClinicStatus(ClinicStatus.PENDING);
+    }
+
+    public Clinic approve(Integer id) {
+        Clinic clinic = findById(id);
+        clinic.setClinicStatus(ClinicStatus.APPROVED);
+        return clinicRepository.save(clinic);
+    }
+
+    public Clinic deny(Integer id) {
+        Clinic clinic = findById(id);
+        clinic.setClinicStatus(ClinicStatus.DENIED);
+        return clinicRepository.save(clinic);
     }
 }
