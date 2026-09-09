@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>SuperBicho - Status da Clínica</title>
+</head>
+<body>
+<h1>Olá, <span th:text="${clinic.name}">Clínica</span></h1>
+
+<div th:if="${clinic.clinicStatus.name() == 'PENDING'}">
+    <p>Sua clínica está sendo analisada para aprovação de credenciados. Por favor, aguarde.</p>
+</div>
+
+<div th:if="${clinic.clinicStatus.name() == 'APPROVED'}">
+    <p>Sua clínica foi aprovada! Bem-vinda ao SuperBicho.</p>
+</div>
+
+<div th:if="${clinic.clinicStatus.name() == 'DENIED'}">
+    <p>Seu cadastro não foi aprovado. Entre em contato com o suporte para mais informações.</p>
+</div>
+
+</body>
+</html>

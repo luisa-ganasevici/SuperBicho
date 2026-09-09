@@ -48,4 +48,8 @@ public class ClinicService {
 
     private ResponseStatusException notFound() {
         return new ResponseStatusException(HttpStatus.NOT_FOUND, "Clinic not found"); }
+
+    public Clinic findByEmail(String email) {
+        return clinicRepository.findByEmail(email).orElseThrow(() -> notFound());
+    }
 }
