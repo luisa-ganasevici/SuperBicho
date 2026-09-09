@@ -29,6 +29,11 @@ public class AnimalService {
     public List<Animal> findByGuardian(Integer guardianId) {
         return animalRepository.findByGuardianId(guardianId); }
 
+    @Cacheable(value = "animalsBySpecies", key = "#species + '-' + #pageable.pageNumber")
+    public Page<Animal> findBySpecies(String species, Pageable pageable) {
+        return animalRepository.findBySpecies(species, pageable); }
+
+
     @Cacheable(value = "animalById", key = "#id")
     public Animal findById(Integer id) {
         return animalRepository.findById(id).orElseThrow(() -> notFound("Animal")); }

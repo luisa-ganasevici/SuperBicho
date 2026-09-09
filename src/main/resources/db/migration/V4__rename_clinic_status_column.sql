@@ -1,0 +1,1 @@
+ALTER TABLE SB_TB_CLINIC RENAME COLUMN status TO clinic_status;

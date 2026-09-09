@@ -19,8 +19,8 @@ public class AnimalController {
         return animalService.findAll(pageable); }
 
     @GetMapping("/species")
-    public List<Animal> findBySpecies(@RequestParam String species) {
-        return animalService.findBySpecies(species); }
+    public Page<Animal> findBySpecies(@RequestParam String species, Pageable pageable) {
+        return animalService.findBySpecies(species, pageable); }
 
     @GetMapping("/guardian/{guardianId}")
     public List<Animal> findByGuardian(@PathVariable Integer guardianId) {
