@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <title>SuperBicho</title>
@@ -7,5 +7,17 @@
 <body>
 <h1>SuperBicho</h1>
 <p>Sistema de gestão veterinária.</p>
+
+<h2>Tutor</h2>
+<a th:href="@{/login}">Login</a> |
+<a th:href="@{/cadastro}">Cadastrar</a>
+
+<h2>Clínica</h2>
+<a th:href="@{/clinica/login}">Login</a> |
+<a th:href="@{/clinica/cadastro}">Cadastrar</a>
+
+<h2>Administrador</h2>
+<a th:href="@{/adm/login}">Login</a>
+
 </body>
 </html>
