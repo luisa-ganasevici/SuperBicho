@@ -1,6 +1,6 @@
 package br.com.fiap.SuperBicho.controller;
 
-import br.com.fiap.SuperBicho.dto.AnimalDTO;
+import br.com.fiap.SuperBicho.dto.request.AnimalRequestDTO;
 import br.com.fiap.SuperBicho.entity.Guardian;
 import br.com.fiap.SuperBicho.service.AnimalService;
 import br.com.fiap.SuperBicho.service.GuardianService;
@@ -21,9 +21,9 @@ public class GuardianHomeController {
     private final AnimalService animalService;
 
     @ModelAttribute("animalDTO")
-    public AnimalDTO prepareAnimalDTO(Authentication authentication) {
+    public AnimalRequestDTO prepareAnimalDTO(Authentication authentication) {
         Guardian guardian = guardianService.findByEmail(authentication.getName());
-        AnimalDTO dto = new AnimalDTO();
+        AnimalRequestDTO dto = new AnimalRequestDTO();
         dto.setGuardianId(guardian.getId());
         return dto;
     }
@@ -41,7 +41,7 @@ public class GuardianHomeController {
     }
 
     @PostMapping("/pet")
-    public String petSubmit(@Valid @ModelAttribute AnimalDTO animalDTO, BindingResult result) {
+    public String petSubmit(@Valid @ModelAttribute AnimalRequestDTO animalDTO, BindingResult result) {
         if (result.hasErrors()) {
             return "cadastro-pet";
         }

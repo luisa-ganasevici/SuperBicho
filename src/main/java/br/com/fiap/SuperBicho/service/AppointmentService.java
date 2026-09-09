@@ -1,5 +1,7 @@
 package br.com.fiap.SuperBicho.service;
 
+import br.com.fiap.SuperBicho.dto.request.AppointmentRequestDTO;
+import br.com.fiap.SuperBicho.dto.response.AppointmentResponseDTO;
 import br.com.fiap.SuperBicho.entity.*;
 import br.com.fiap.SuperBicho.repository.*;
 import lombok.RequiredArgsConstructor;
@@ -13,75 +15,72 @@ import org.springframework.web.server.ResponseStatusException;
 public class AppointmentService {
 
     private final AppointmentRepository appointmentRepository;
-
     private final HistoryRepository historyRepository;
-
     private final AnimalRepository animalRepository;
-
     private final ClinicRepository clinicRepository;
 
     @Cacheable("appointments")
-    public Page<Appointment> findAll(Pageable pageable) {
-        return appointmentRepository.findAll(pageable); }
+    public Page<AppointmentResponseDTO> findAll(Pageable pageable) {
+        return appointmentRepository.findAll(pageable).map(this::toResponse); }
 
     @Cacheable(value = "appointmentById", key = "#id")
-    public Appointment findById(Integer id) {
-        return appointmentRepository.findById(id).orElseThrow(() -> notFound("Appointment")); }
+    public AppointmentResponseDTO findById(Integer id) {
+        return toResponse(findEntityById(id)); }
 
     @CacheEvict(value = {"appointments", "appointmentById"}, allEntries = true)
-    public Appointment create(Appointment appointment) {
-
-        appointment.setAnimal(resolveAnimal(appointment.getAnimal()));
-
-        appointment.setClinic(resolveClinic(appointment.getClinic()));
-
-        Appointment savedAppointment = appointmentRepository.save(appointment);
+    public AppointmentResponseDTO create(AppointmentRequestDTO dto) {
+        Appointment appointment = new Appointment();
+        appointment.setDate(dto.getDate());
+        appointment.setTime(dto.getTime());
+        appointment.setStatus(dto.getStatus());
+        appointment.setAnimal(resolveAnimal(dto.getAnimalId()));
+        appointment.setClinic(resolveClinic(dto.getClinicId()));
+        Appointment saved = appointmentRepository.save(appointment);
 
         History history = new History();
-
         history.setDescription("Appointment was scheduled");
-
         history.setType("APPOINTMENT");
-
-        history.setRecordDate(appointment.getDate());
-
-        history.setAnimal(appointment.getAnimal());
-
+        history.setRecordDate(saved.getDate());
+        history.setAnimal(saved.getAnimal());
         historyRepository.save(history);
 
-        return savedAppointment; }
+        return toResponse(saved);
+    }
 
     @CacheEvict(value = {"appointments", "appointmentById"}, allEntries = true)
-    public Appointment update(Integer id, Appointment updatedAppointment) {
-
-        Appointment appointment = findById(id);
-
-        appointment.setDate(updatedAppointment.getDate());
-
-        appointment.setTime(updatedAppointment.getTime());
-
-        appointment.setStatus(updatedAppointment.getStatus());
-
-        if (updatedAppointment.getAnimal() != null && updatedAppointment.getAnimal().getId() != null)
-            appointment.setAnimal(resolveAnimal(updatedAppointment.getAnimal()));
-
-        if (updatedAppointment.getClinic() != null && updatedAppointment.getClinic().getId() != null)
-            appointment.setClinic(resolveClinic(updatedAppointment.getClinic()));
-
-        return appointmentRepository.save(appointment); }
+    public AppointmentResponseDTO update(Integer id, AppointmentRequestDTO dto) {
+        Appointment appointment = findEntityById(id);
+        appointment.setDate(dto.getDate());
+        appointment.setTime(dto.getTime());
+        appointment.setStatus(dto.getStatus());
+        appointment.setAnimal(resolveAnimal(dto.getAnimalId()));
+        appointment.setClinic(resolveClinic(dto.getClinicId()));
+        return toResponse(appointmentRepository.save(appointment));
+    }
 
     @CacheEvict(value = {"appointments", "appointmentById"}, allEntries = true)
-    public void deleteById(Integer id) { if (!appointmentRepository.existsById(id)) throw notFound
-            ("Appointment"); appointmentRepository.deleteById(id); }
+    public void deleteById(Integer id) {
+        if (!appointmentRepository.existsById(id)) throw notFound("Appointment");
+        appointmentRepository.deleteById(id);
+    }
 
-    private Animal resolveAnimal(Animal animal) { if (animal == null || animal.getId() == null)
-        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Animal is required");
-        return animalRepository.findById(animal.getId()).orElseThrow(() -> notFound("Animal")); }
+    public Appointment findEntityById(Integer id) {
+        return appointmentRepository.findById(id).orElseThrow(() -> notFound("Appointment"));
+    }
 
-    private Clinic resolveClinic(Clinic clinic) { if (clinic == null || clinic.getId() == null)
-        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Clinic is required");
-        return clinicRepository.findById(clinic.getId()).orElseThrow(() -> notFound("Clinic")); }
+    private Animal resolveAnimal(Integer animalId) {
+        return animalRepository.findById(animalId).orElseThrow(() -> notFound("Animal"));
+    }
 
-    private ResponseStatusException notFound(String resource)
-    { return new ResponseStatusException(HttpStatus.NOT_FOUND, resource + " not found"); }
+    private Clinic resolveClinic(Integer clinicId) {
+        return clinicRepository.findById(clinicId).orElseThrow(() -> notFound("Clinic"));
+    }
+
+    private AppointmentResponseDTO toResponse(Appointment appointment) {
+        return new AppointmentResponseDTO(appointment.getId(), appointment.getDate(), appointment.getTime(), appointment.getStatus(), appointment.getAnimal().getId(), appointment.getClinic().getId());
+    }
+
+    private ResponseStatusException notFound(String resource) {
+        return new ResponseStatusException(HttpStatus.NOT_FOUND, resource + " not found");
+    }
 }

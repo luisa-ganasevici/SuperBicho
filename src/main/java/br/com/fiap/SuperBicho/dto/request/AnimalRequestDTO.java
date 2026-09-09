@@ -1,10 +1,10 @@
-package br.com.fiap.SuperBicho.dto;
+package br.com.fiap.SuperBicho.dto.request;
 
 import jakarta.validation.constraints.*;
 import lombok.*;
 
 @Getter @Setter @NoArgsConstructor @AllArgsConstructor
-public class AnimalDTO {
+public class AnimalRequestDTO {
     @NotBlank(message = "É preciso informar o nome do animal") private String name;
 
     @NotBlank(message = "É preciso informar a especie ") private String species;

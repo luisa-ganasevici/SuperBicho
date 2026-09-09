@@ -1,6 +1,7 @@
 package br.com.fiap.SuperBicho.controller;
 
-import br.com.fiap.SuperBicho.entity.Appointment;
+import br.com.fiap.SuperBicho.dto.request.AppointmentRequestDTO;
+import br.com.fiap.SuperBicho.dto.response.AppointmentResponseDTO;
 import br.com.fiap.SuperBicho.service.AppointmentService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -13,24 +14,25 @@ public class AppointmentController {
 
     private final AppointmentService appointmentService;
 
-
     @GetMapping
-    public Page<Appointment> findAll(Pageable pageable) {
+    public Page<AppointmentResponseDTO> findAll(Pageable pageable) {
         return appointmentService.findAll(pageable); }
 
     @GetMapping("/{id}")
-    public Appointment findById(@PathVariable Integer id) {
+    public AppointmentResponseDTO findById(@PathVariable Integer id) {
         return appointmentService.findById(id); }
 
     @PostMapping
-    @ResponseStatus(HttpStatus.CREATED) public Appointment create(@Valid @RequestBody Appointment appointment) {
-        return appointmentService.create(appointment); }
+    @ResponseStatus(HttpStatus.CREATED)
+    public AppointmentResponseDTO create(@Valid @RequestBody AppointmentRequestDTO dto) {
+        return appointmentService.create(dto); }
 
     @PutMapping("/{id}")
-    public Appointment update(@PathVariable Integer id, @Valid @RequestBody Appointment appointment) {
-        return appointmentService.update(id, appointment); }
+    public AppointmentResponseDTO update(@PathVariable Integer id, @Valid @RequestBody AppointmentRequestDTO dto) {
+        return appointmentService.update(id, dto); }
 
     @DeleteMapping("/{id}")
-    @ResponseStatus(HttpStatus.NO_CONTENT) public void deleteById(@PathVariable Integer id) {
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteById(@PathVariable Integer id) {
         appointmentService.deleteById(id); }
 }

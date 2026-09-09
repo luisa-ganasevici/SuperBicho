@@ -1,7 +1,7 @@
 package br.com.fiap.SuperBicho.controller;
 
-import br.com.fiap.SuperBicho.dto.AnimalDTO;
-import br.com.fiap.SuperBicho.entity.Animal;
+import br.com.fiap.SuperBicho.dto.request.AnimalRequestDTO;
+import br.com.fiap.SuperBicho.dto.response.AnimalResponseDTO;
 import br.com.fiap.SuperBicho.service.AnimalService;
 import jakarta.validation.Valid;
 import java.util.List;
@@ -15,29 +15,31 @@ public class AnimalController {
     private final AnimalService animalService;
 
     @GetMapping
-    public Page <Animal> findAll(Pageable pageable) {
+    public Page<AnimalResponseDTO> findAll(Pageable pageable) {
         return animalService.findAll(pageable); }
 
     @GetMapping("/species")
-    public Page<Animal> findBySpecies(@RequestParam String species, Pageable pageable) {
+    public Page<AnimalResponseDTO> findBySpecies(@RequestParam String species, Pageable pageable) {
         return animalService.findBySpecies(species, pageable); }
 
     @GetMapping("/guardian/{guardianId}")
-    public List<Animal> findByGuardian(@PathVariable Integer guardianId) {
+    public List<AnimalResponseDTO> findByGuardian(@PathVariable Integer guardianId) {
         return animalService.findByGuardian(guardianId); }
 
     @GetMapping("/{id}")
-    public Animal findById(@PathVariable Integer id) {
+    public AnimalResponseDTO findById(@PathVariable Integer id) {
         return animalService.findById(id); }
 
-    @PostMapping @ResponseStatus(HttpStatus.CREATED)
-    public Animal create(@Valid @RequestBody AnimalDTO dto) {
+    @PostMapping
+    @ResponseStatus(HttpStatus.CREATED)
+    public AnimalResponseDTO create(@Valid @RequestBody AnimalRequestDTO dto) {
         return animalService.create(dto); }
 
     @PutMapping("/{id}")
-    public Animal update(@PathVariable Integer id, @Valid @RequestBody AnimalDTO dto) {
+    public AnimalResponseDTO update(@PathVariable Integer id, @Valid @RequestBody AnimalRequestDTO dto) {
         return animalService.update(id, dto); }
 
-    @DeleteMapping("/{id}") @ResponseStatus(HttpStatus.NO_CONTENT)
+    @DeleteMapping("/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteById(@PathVariable Integer id) { animalService.deleteById(id); }
 }

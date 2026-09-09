@@ -1,6 +1,7 @@
 package br.com.fiap.SuperBicho.controller;
 
-import br.com.fiap.SuperBicho.entity.CheckUp;
+import br.com.fiap.SuperBicho.dto.request.CheckUpRequestDTO;
+import br.com.fiap.SuperBicho.dto.response.CheckUpResponseDTO;
 import br.com.fiap.SuperBicho.service.CheckUpService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -14,22 +15,24 @@ public class CheckUpController {
     private final CheckUpService checkUpService;
 
     @GetMapping
-    public Page<CheckUp> findAll(Pageable pageable) {
+    public Page<CheckUpResponseDTO> findAll(Pageable pageable) {
         return checkUpService.findAll(pageable); }
 
     @GetMapping("/{id}")
-    public CheckUp findById(@PathVariable Integer id) {
+    public CheckUpResponseDTO findById(@PathVariable Integer id) {
         return checkUpService.findById(id); }
 
     @PostMapping
-    @ResponseStatus(HttpStatus.CREATED) public CheckUp create(@Valid @RequestBody CheckUp checkUp) {
-        return checkUpService.create(checkUp); }
+    @ResponseStatus(HttpStatus.CREATED)
+    public CheckUpResponseDTO create(@Valid @RequestBody CheckUpRequestDTO dto) {
+        return checkUpService.create(dto); }
 
     @PutMapping("/{id}")
-    public CheckUp update(@PathVariable Integer id, @Valid @RequestBody CheckUp checkUp) {
-        return checkUpService.update(id, checkUp); }
+    public CheckUpResponseDTO update(@PathVariable Integer id, @Valid @RequestBody CheckUpRequestDTO dto) {
+        return checkUpService.update(id, dto); }
 
     @DeleteMapping("/{id}")
-    @ResponseStatus(HttpStatus.NO_CONTENT) public void deleteById(@PathVariable Integer id) {
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteById(@PathVariable Integer id) {
         checkUpService.deleteById(id); }
 }
