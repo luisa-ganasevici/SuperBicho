@@ -52,5 +52,11 @@ public class AnimalService {
         animal.setName(dto.getName()); animal.setSpecies(dto.getSpecies()); animal.setAge(dto.getAge()); animal.setWeight(dto.getWeight()); animal.setGuardian(guardian);
         return animal;
     }
-    private ResponseStatusException notFound(String resource) { return new ResponseStatusException(HttpStatus.NOT_FOUND, resource + " not found"); }
+    private ResponseStatusException notFound(String resource) {
+        return new ResponseStatusException(HttpStatus.NOT_FOUND, resource + " not found"); }
+
+    public Animal createForGuardian(AnimalDTO dto, Integer guardianId) {
+        dto.setGuardianId(guardianId);
+        return create(dto);
+    }
 }

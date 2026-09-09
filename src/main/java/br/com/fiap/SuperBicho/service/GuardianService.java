@@ -17,8 +17,6 @@ public class GuardianService {
     private final GuardianRepository guardianRepository;
     private final PasswordEncoder passwordEncoder;
 
-
-
     @Cacheable("guardians")
     public Page<Guardian> findAll(Pageable pageable) {
         return guardianRepository.findAll(pageable); }
@@ -45,4 +43,8 @@ public class GuardianService {
 
     private ResponseStatusException notFound() {
         return new ResponseStatusException(HttpStatus.NOT_FOUND, "Guardian not found"); }
+
+    public Guardian findByEmail(String email) {
+        return guardianRepository.findByEmail(email).orElseThrow(() -> notFound());
+    }
 }

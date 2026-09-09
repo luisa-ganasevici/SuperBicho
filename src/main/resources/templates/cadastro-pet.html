@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>SuperBicho - Cadastrar Pet</title>
+</head>
+<body>
+<h1>Cadastrar Pet</h1>
+<form th:action="@{/guardian/pet}" th:object="${animalDTO}" method="post">
+    <label>Nome:
+        <input type="text" th:field="*{name}">
+    </label>
+    <p th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></p>
+    <br>
+
+    <label>Espécie:
+        <input type="text" th:field="*{species}">
+    </label>
+    <p th:if="${#fields.hasErrors('species')}" th:errors="*{species}"></p>
+    <br>
+
+    <label>Idade:
+        <input type="number" th:field="*{age}">
+    </label>
+    <p th:if="${#fields.hasErrors('age')}" th:errors="*{age}"></p>
+    <br>
+
+    <label>Peso (kg):
+        <input type="number" step="0.01" th:field="*{weight}">
+    </label>
+    <p th:if="${#fields.hasErrors('weight')}" th:errors="*{weight}"></p>
+    <br>
+
+    <button type="submit">Cadastrar</button>
+</form>
+
+<br><a th:href="@{/guardian/home}">Voltar</a>
+</body>
+</html>

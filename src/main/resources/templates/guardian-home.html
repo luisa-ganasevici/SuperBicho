@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>SuperBicho - Home</title>
+</head>
+<body>
+<h1>Meus pets</h1>
+
+<p th:if="${#lists.isEmpty(animals)}">Você ainda não cadastrou nenhum pet.</p>
+
+<table th:unless="${#lists.isEmpty(animals)}" border="1">
+    <tr>
+        <th>Nome</th>
+        <th>Espécie</th>
+        <th>Idade</th>
+        <th>Peso</th>
+    </tr>
+    <tr th:each="animal : ${animals}">
+        <td th:text="${animal.name}"></td>
+        <td th:text="${animal.species}"></td>
+        <td th:text="${animal.age}"></td>
+        <td th:text="${animal.weight}"></td>
+    </tr>
+</table>
+
+<br>
+<a th:href="@{/guardian/pet}">Cadastrar novo pet</a>
+<br><a th:href="@{/}">Voltar para a Home</a>
+
+</body>
+</html>
