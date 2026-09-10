@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>SuperBicho - Agendar</title>
+</head>
+<body>
+<h1>Agendar Consulta/Exame</h1>
+<form th:action="@{/guardian/agendamento}" th:object="${appointmentDTO}" method="post">
+  <label>Pet:
+    <select th:field="*{animalId}">
+      <option th:each="pet : ${pets}" th:value="${pet.id}" th:text="${pet.name}"></option>
+    </select>
+  </label>
+  <p th:if="${#fields.hasErrors('animalId')}" th:errors="*{animalId}"></p>
+  <br>
+
+  <label>Clínica:
+    <select th:field="*{clinicId}">
+      <option th:each="clinic : ${clinics}" th:value="${clinic.id}" th:text="${clinic.name}"></option>
+    </select>
+  </label>
+  <p th:if="${#fields.hasErrors('clinicId')}" th:errors="*{clinicId}"></p>
+  <br>
+
+  <label>Data:
+    <input type="date" th:field="*{date}">
+  </label>
+  <p th:if="${#fields.hasErrors('date')}" th:errors="*{date}"></p>
+  <br>
+
+  <label>Horário:
+    <input type="time" th:field="*{time}">
+  </label>
+  <p th:if="${#fields.hasErrors('time')}" th:errors="*{time}"></p>
+  <br>
+
+  <button type="submit">Agendar</button>
+</form>
+
+<br><a th:href="@{/guardian/home}">Voltar</a>
+</body>
+</html>

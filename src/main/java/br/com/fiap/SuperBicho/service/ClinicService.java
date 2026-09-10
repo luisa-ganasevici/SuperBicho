@@ -98,4 +98,8 @@ public class ClinicService {
     private ResponseStatusException notFound() {
         return new ResponseStatusException(HttpStatus.NOT_FOUND, "Clinic not found");
     }
+
+    public List<Clinic> findApproved() {
+        return clinicRepository.findByClinicStatus(ClinicStatus.APPROVED);
+    }
 }
