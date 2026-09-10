@@ -1,6 +1,7 @@
 package br.com.fiap.SuperBicho.controller;
 
 import br.com.fiap.SuperBicho.entity.Clinic;
+import br.com.fiap.SuperBicho.service.AppointmentService;
 import br.com.fiap.SuperBicho.service.ClinicService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -18,6 +19,7 @@ import org.springframework.security.core.Authentication;
 public class ClinicWebController {
 
     private final ClinicService clinicService;
+    private final AppointmentService appointmentService;
 
     @InitBinder
     public void initBinder(WebDataBinder binder) {
@@ -55,7 +57,7 @@ public class ClinicWebController {
     public String home(Model model, Authentication authentication) {
         Clinic clinic = clinicService.findByEmail(authentication.getName());
         model.addAttribute("clinic", clinic);
+        model.addAttribute("appointments", appointmentService.findByClinic(clinic.getId()));
         return "clinic-home";
     }
-
 }

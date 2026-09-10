@@ -93,4 +93,10 @@ public class AppointmentService {
                 .map(this::toResponse)
                 .toList();
     }
+
+    public List<AppointmentResponseDTO> findByClinic(Integer clinicId) {
+        return appointmentRepository.findByClinicId(clinicId).stream()
+                .map(this::toResponse)
+                .toList();
+    }
 }

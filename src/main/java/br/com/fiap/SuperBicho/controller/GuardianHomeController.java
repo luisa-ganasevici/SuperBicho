@@ -51,7 +51,7 @@ public class GuardianHomeController {
     }
 
     @PostMapping("/pet")
-    public String petSubmit(@Valid @ModelAttribute AnimalRequestDTO animalDTO, BindingResult result) {
+    public String petSubmit(@Valid @ModelAttribute("animalDTO") AnimalRequestDTO animalDTO, BindingResult result) {
         if (result.hasErrors()) {
             return "cadastro-pet";
         }
@@ -77,7 +77,7 @@ public class GuardianHomeController {
     }
 
     @PostMapping("/agendamento")
-    public String agendamentoSubmit(@Valid @ModelAttribute AppointmentRequestDTO appointmentDTO, BindingResult result,
+    public String agendamentoSubmit(@Valid @ModelAttribute("appointmentDTO") AppointmentRequestDTO appointmentDTO, BindingResult result,
                                     Authentication authentication, Model model) {
         Guardian guardian = guardianService.findByEmail(authentication.getName());
         boolean petPertenceAoTutor = animalService.findByGuardian(guardian.getId()).stream()
@@ -117,7 +117,7 @@ public class GuardianHomeController {
     }
 
     @PostMapping("/exame")
-    public String exameSubmit(@Valid @ModelAttribute CheckUpRequestDTO checkUpDTO, BindingResult result,
+    public String exameSubmit(@Valid @ModelAttribute("checkUpDTO") CheckUpRequestDTO checkUpDTO, BindingResult result,
                               Authentication authentication, Model model) {
         Guardian guardian = guardianService.findByEmail(authentication.getName());
         boolean petPertenceAoTutor = animalService.findByGuardian(guardian.getId()).stream()

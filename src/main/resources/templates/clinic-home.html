@@ -7,9 +7,30 @@
 <body>
 <h1>Painel - <span th:text="${clinic.name}">Clínica</span></h1>
 
-<p>Bem-vinda ao site de credenciados da SuperBicho! Em breve você poderá ver aqui seus agendamentos de consultas e exames.</p>
+<p>Bem-vinda ao site de credenciados da SuperBicho!</p>
 
-<br><a th:href="@{/}">Voltar para a Home</a>
+<h2>Agendamentos</h2>
+<p th:if="${#lists.isEmpty(appointments)}">Nenhum agendamento no momento.</p>
+<table th:if="${not #lists.isEmpty(appointments)}">
+    <thead>
+    <tr>
+        <th>Pet</th>
+        <th>Data</th>
+        <th>Horário</th>
+        <th>Status</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="appointment : ${appointments}">
+        <td th:text="${appointment.animalName}"></td>
+        <td th:text="${appointment.date}"></td>
+        <td th:text="${appointment.time}"></td>
+        <td th:text="${appointment.status}"></td>
+    </tr>
+    </tbody>
+</table>
+
+
 <form th:action="@{/clinica/logout}" method="post">
     <button type="submit">logout</button>
 </form>
