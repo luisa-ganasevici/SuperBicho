@@ -37,6 +37,21 @@
     <p th:if="${#fields.hasErrors('password')}" th:errors="*{password}"></p>
     <br>
 
+    <label>CNPJ (14 dígitos):
+        <input type="text" th:field="*{cnpj}">
+    </label>
+    <p th:if="${#fields.hasErrors('cnpj')}" th:errors="*{cnpj}"></p>
+    <br>
+
+    <label>Especialidades:</label><br>
+    <label><input type="checkbox" th:field="*{specialties}" value="Clínica Geral"> Clínica Geral</label><br>
+    <label><input type="checkbox" th:field="*{specialties}" value="Cirurgia"> Cirurgia</label><br>
+    <label><input type="checkbox" th:field="*{specialties}" value="Dermatologia"> Dermatologia</label><br>
+    <label><input type="checkbox" th:field="*{specialties}" value="Cardiologia"> Cardiologia</label><br>
+    <label><input type="checkbox" th:field="*{specialties}" value="Odontologia"> Odontologia</label><br>
+    <label><input type="checkbox" th:field="*{specialties}" value="Oftalmologia"> Oftalmologia</label><br>
+    <br>
+
     <button type="submit">Cadastrar</button>
 </form>
 <br><a th:href="@{/}">Voltar para a Home</a>

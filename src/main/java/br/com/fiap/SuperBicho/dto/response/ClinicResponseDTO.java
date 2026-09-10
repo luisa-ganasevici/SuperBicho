@@ -1,6 +1,7 @@
 package br.com.fiap.SuperBicho.dto.response;
 
 import br.com.fiap.SuperBicho.entity.ClinicStatus;
+import java.util.List;
 import lombok.*;
 
 @Getter
@@ -14,4 +15,6 @@ public class ClinicResponseDTO {
     private String phone;
     private String email;
     private ClinicStatus clinicStatus;
+    private String cnpj;
+    private List<String> specialties;
 }

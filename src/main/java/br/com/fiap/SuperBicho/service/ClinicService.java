@@ -45,6 +45,8 @@ public class ClinicService {
         clinic.setPhone(dto.getPhone());
         clinic.setEmail(dto.getEmail());
         clinic.setPassword(passwordEncoder.encode(dto.getPassword()));
+        clinic.setCnpj(dto.getCnpj());
+        clinic.setSpecialties(dto.getSpecialties());
         clinic.setClinicStatus(ClinicStatus.PENDING);
         return toResponse(clinicRepository.save(clinic));
     }
@@ -64,6 +66,8 @@ public class ClinicService {
         clinic.setPhone(dto.getPhone());
         clinic.setEmail(dto.getEmail());
         clinic.setPassword(passwordEncoder.encode(dto.getPassword()));
+        clinic.setCnpj(dto.getCnpj());
+        clinic.setSpecialties(dto.getSpecialties());
         return toResponse(clinicRepository.save(clinic));
     }
 
@@ -88,7 +92,7 @@ public class ClinicService {
     }
 
     private ClinicResponseDTO toResponse(Clinic clinic) {
-        return new ClinicResponseDTO(clinic.getId(), clinic.getName(), clinic.getAddress(), clinic.getPhone(), clinic.getEmail(), clinic.getClinicStatus());
+        return new ClinicResponseDTO(clinic.getId(), clinic.getName(), clinic.getAddress(), clinic.getPhone(), clinic.getEmail(), clinic.getClinicStatus(), clinic.getCnpj(), clinic.getSpecialties());
     }
 
     private ResponseStatusException notFound() {
