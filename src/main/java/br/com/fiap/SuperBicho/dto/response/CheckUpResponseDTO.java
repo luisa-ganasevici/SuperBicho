@@ -13,4 +13,5 @@ public class CheckUpResponseDTO {
     private String status;
     private String notes;
     private Integer animalId;
+    private String animalName;
 }

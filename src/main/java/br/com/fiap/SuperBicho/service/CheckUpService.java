@@ -11,6 +11,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.List;
+
 @Service @RequiredArgsConstructor
 public class CheckUpService {
 
@@ -72,10 +74,17 @@ public class CheckUpService {
     }
 
     private CheckUpResponseDTO toResponse(CheckUp checkUp) {
-        return new CheckUpResponseDTO(checkUp.getId(), checkUp.getCheckUpType(), checkUp.getCheckUpDate(), checkUp.getStatus(), checkUp.getNotes(), checkUp.getAnimal().getId());
+        return new CheckUpResponseDTO(checkUp.getId(), checkUp.getCheckUpType(), checkUp.getCheckUpDate(),
+                checkUp.getStatus(), checkUp.getNotes(), checkUp.getAnimal().getId(), checkUp.getAnimal().getName());
     }
 
     private ResponseStatusException notFound(String resource) {
         return new ResponseStatusException(HttpStatus.NOT_FOUND, resource + " not found");
+    }
+
+    public List<CheckUpResponseDTO> findByGuardian(Integer guardianId) {
+        return checkUpRepository.findByAnimal_GuardianId(guardianId).stream()
+                .map(this::toResponse)
+                .toList();
     }
 }

@@ -1,0 +1,10 @@
+ALTER TABLE SB_TB_CLINIC ADD (
+    cnpj VARCHAR2(14)
+);
+
+CREATE TABLE SB_TB_CLINIC_SPECIALTY (
+    clinic_id NUMBER(10) NOT NULL,
+    specialty VARCHAR2(255) NOT NULL,
+    CONSTRAINT fk_clinic_specialty_clinic
+    FOREIGN KEY (clinic_id) REFERENCES SB_TB_CLINIC(id)
+);

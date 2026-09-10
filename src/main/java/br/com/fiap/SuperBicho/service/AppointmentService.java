@@ -11,6 +11,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.List;
+
 @Service @RequiredArgsConstructor
 public class AppointmentService {
 
@@ -77,10 +79,18 @@ public class AppointmentService {
     }
 
     private AppointmentResponseDTO toResponse(Appointment appointment) {
-        return new AppointmentResponseDTO(appointment.getId(), appointment.getDate(), appointment.getTime(), appointment.getStatus(), appointment.getAnimal().getId(), appointment.getClinic().getId());
+        return new AppointmentResponseDTO(appointment.getId(), appointment.getDate(), appointment.getTime(),
+                appointment.getStatus(), appointment.getAnimal().getId(), appointment.getAnimal().getName(),
+                appointment.getClinic().getId(), appointment.getClinic().getName());
     }
 
     private ResponseStatusException notFound(String resource) {
         return new ResponseStatusException(HttpStatus.NOT_FOUND, resource + " not found");
+    }
+
+    public  List<AppointmentResponseDTO> findByGuardian(Integer guardianId) {
+        return appointmentRepository.findByAnimal_GuardianId(guardianId).stream()
+                .map(this::toResponse)
+                .toList();
     }
 }

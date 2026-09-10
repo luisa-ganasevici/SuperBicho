@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>SuperBicho - Exame</title>
+</head>
+<body>
+<h1>Registrar Exame</h1>
+<form th:action="@{/guardian/exame}" th:object="${checkUpDTO}" method="post">
+  <label>Pet:
+    <select th:field="*{animalId}">
+      <option th:each="pet : ${pets}" th:value="${pet.id}" th:text="${pet.name}"></option>
+    </select>
+  </label>
+  <p th:if="${#fields.hasErrors('animalId')}" th:errors="*{animalId}"></p>
+  <br>
+
+  <label>Tipo de exame:
+    <input type="text" th:field="*{checkUpType}">
+  </label>
+  <p th:if="${#fields.hasErrors('checkUpType')}" th:errors="*{checkUpType}"></p>
+  <br>
+
+  <label>Data do exame:
+    <input type="date" th:field="*{checkUpDate}">
+  </label>
+  <p th:if="${#fields.hasErrors('checkUpDate')}" th:errors="*{checkUpDate}"></p>
+  <br>
+
+  <label>Observações:
+    <textarea th:field="*{notes}"></textarea>
+  </label>
+  <p th:if="${#fields.hasErrors('notes')}" th:errors="*{notes}"></p>
+  <br>
+
+  <button type="submit">Registrar exame</button>
+</form>
+
+<br><a th:href="@{/guardian/home}">Voltar</a>
+</body>
+</html>
