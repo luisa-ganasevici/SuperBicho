@@ -31,6 +31,7 @@ public class SecurityConfig {
         provider.setPasswordEncoder(passwordEncoder());
         return provider;
     }
+
     @Bean
     @Order(1)
     public SecurityFilterChain adminFilterChain(HttpSecurity http) throws Exception {
@@ -43,6 +44,10 @@ public class SecurityConfig {
                         .loginPage("/adm/login")
                         .loginProcessingUrl("/adm/login")
                         .defaultSuccessUrl("/adm/home", true)
+                        .permitAll())
+                .logout(logout -> logout
+                        .logoutUrl("/adm/logout")
+                        .logoutSuccessUrl("/adm/login")
                         .permitAll());
         return http.build();
     }
@@ -55,11 +60,16 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/clinica/login", "/clinica/cadastro").permitAll()
                         .requestMatchers("/clinica/status").hasAnyRole("CLINICA_PENDING", "CLINICA_APPROVED", "CLINICA_DENIED")
+                        .requestMatchers("/clinica/home").hasRole("CLINICA_APPROVED")
                         .anyRequest().hasRole("CLINICA_APPROVED"))
                 .formLogin(form -> form
                         .loginPage("/clinica/login")
-                        .loginProcessingUrl("/clinica/login") //
+                        .loginProcessingUrl("/clinica/login")
                         .defaultSuccessUrl("/clinica/status", true)
+                        .permitAll())
+                .logout(logout -> logout
+                        .logoutUrl("/clinica/logout")
+                        .logoutSuccessUrl("/clinica/login")
                         .permitAll());
         return http.build();
     }
@@ -76,6 +86,10 @@ public class SecurityConfig {
                         .loginPage("/login")
                         .loginProcessingUrl("/login")
                         .defaultSuccessUrl("/guardian/home", true)
+                        .permitAll())
+                .logout(logout -> logout
+                        .logoutUrl("/logout")
+                        .logoutSuccessUrl("/login")
                         .permitAll());
         return http.build();
     }

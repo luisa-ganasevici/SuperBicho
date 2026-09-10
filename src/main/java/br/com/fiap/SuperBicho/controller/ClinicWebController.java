@@ -50,4 +50,12 @@ public class ClinicWebController {
         model.addAttribute("clinic", clinic);
         return "clinic-status";
     }
+
+    @GetMapping("/home")
+    public String home(Model model, Authentication authentication) {
+        Clinic clinic = clinicService.findByEmail(authentication.getName());
+        model.addAttribute("clinic", clinic);
+        return "clinic-home";
+    }
+
 }

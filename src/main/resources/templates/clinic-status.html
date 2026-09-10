@@ -13,11 +13,14 @@
 
 <div th:if="${clinic.clinicStatus.name() == 'APPROVED'}">
     <p>Sua clínica foi aprovada! Bem-vinda ao SuperBicho.</p>
+    <a th:href="@{/clinica/home}">Acessar painel</a>
 </div>
 
 <div th:if="${clinic.clinicStatus.name() == 'DENIED'}">
     <p>Seu cadastro não foi aprovado. Entre em contato com o suporte para mais informações.</p>
 </div>
-
+<form th:action="@{/clinica/logout}" method="post">
+    <button type="submit">logout</button>
+</form>
 </body>
 </html>

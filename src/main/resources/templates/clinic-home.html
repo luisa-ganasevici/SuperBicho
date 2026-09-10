@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>SuperBicho - Painel da Clínica</title>
+</head>
+<body>
+<h1>Painel - <span th:text="${clinic.name}">Clínica</span></h1>
+
+<p>Bem-vinda ao site de credenciados da SuperBicho! Em breve você poderá ver aqui seus agendamentos de consultas e exames.</p>
+
+<br><a th:href="@{/}">Voltar para a Home</a>
+<form th:action="@{/clinica/logout}" method="post">
+    <button type="submit">logout</button>
+</form>
+</body>
+</html>

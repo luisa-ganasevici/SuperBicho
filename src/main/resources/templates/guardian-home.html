@@ -27,6 +27,8 @@
 <br>
 <a th:href="@{/guardian/pet}">Cadastrar novo pet</a>
 <br><a th:href="@{/}">Voltar para a Home</a>
-
+<form th:action="@{/logout}" method="post">
+    <button type="submit">logout</button>
+</form>
 </body>
 </html>
