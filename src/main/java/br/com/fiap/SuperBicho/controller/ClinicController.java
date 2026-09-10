@@ -1,6 +1,7 @@
 package br.com.fiap.SuperBicho.controller;
 
-import br.com.fiap.SuperBicho.entity.Clinic;
+import br.com.fiap.SuperBicho.dto.request.ClinicRequestDTO;
+import br.com.fiap.SuperBicho.dto.response.ClinicResponseDTO;
 import br.com.fiap.SuperBicho.service.ClinicService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -14,21 +15,24 @@ public class ClinicController {
     private final ClinicService clinicService;
 
     @GetMapping
-    public Page<Clinic> findAll(Pageable pageable) {
+    public Page<ClinicResponseDTO> findAll(Pageable pageable) {
         return clinicService.findAll(pageable); }
 
     @GetMapping("/{id}")
-    public Clinic findById(@PathVariable Integer id) {
+    public ClinicResponseDTO findById(@PathVariable Integer id) {
         return clinicService.findById(id); }
 
     @PostMapping
-    @ResponseStatus(HttpStatus.CREATED) public Clinic create(@Valid @RequestBody Clinic clinic) {
-        return clinicService.create(clinic); }
+    @ResponseStatus(HttpStatus.CREATED)
+    public ClinicResponseDTO create(@Valid @RequestBody ClinicRequestDTO dto) {
+        return clinicService.create(dto); }
 
     @PutMapping("/{id}")
-    public Clinic update(@PathVariable Integer id, @Valid @RequestBody Clinic clinic) {
-        return clinicService.update(id, clinic); }
+    public ClinicResponseDTO update(@PathVariable Integer id, @Valid @RequestBody ClinicRequestDTO dto) {
+        return clinicService.update(id, dto); }
 
-    @DeleteMapping("/{id}") @ResponseStatus(HttpStatus.NO_CONTENT) public void deleteById(@PathVariable Integer id) {
+    @DeleteMapping("/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteById(@PathVariable Integer id) {
         clinicService.deleteById(id); }
 }
