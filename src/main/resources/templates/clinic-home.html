@@ -14,6 +14,7 @@
 <table th:unless="${#lists.isEmpty(appointments)}" border="1">
     <tr>
         <th>Pet</th>
+        <th>Veterinário</th>
         <th>Data</th>
         <th>Horário</th>
         <th>Status</th>
@@ -63,9 +64,6 @@
             <a th:href="@{'/clinica/exame/' + ${checkUp.id} + '/cancelar'}">
                 Cancelar
             </a>
-        </td>
-                <button type="submit">Concluir</button>
-            </form>
         </td>
     </tr>
 </table>
