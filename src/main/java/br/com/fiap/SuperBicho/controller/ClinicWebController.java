@@ -15,6 +15,7 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
 
 @Controller
@@ -106,9 +107,16 @@ public class ClinicWebController {
 
     @ModelAttribute("veterinarianDTO")
     public VeterinarianRequestDTO prepareVeterinarianDTO(Authentication authentication) {
-        Clinic clinic = clinicService.findByEmail(authentication.getName());
         VeterinarianRequestDTO dto = new VeterinarianRequestDTO();
-        dto.setClinicId(clinic.getId());
+        boolean autenticado = authentication != null
+                && authentication.isAuthenticated()
+                && !(authentication instanceof AnonymousAuthenticationToken);
+        if (autenticado) {
+            Clinic clinic = clinicService.findByEmail(authentication.getName());
+            if (clinic != null) {
+                dto.setClinicId(clinic.getId());
+            }
+        }
         return dto;
     }
 
