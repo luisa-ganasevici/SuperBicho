@@ -1,13 +1,11 @@
 package br.com.fiap.SuperBicho.controller;
 
-
+import br.com.fiap.SuperBicho.entity.Clinic;
+import br.com.fiap.SuperBicho.entity.ClinicStatus;
 import br.com.fiap.SuperBicho.service.AppointmentService;
 import br.com.fiap.SuperBicho.service.CheckUpService;
 import br.com.fiap.SuperBicho.service.ClinicService;
 import br.com.fiap.SuperBicho.service.VeterinarianService;
-import br.com.fiap.SuperBicho.entity.Clinic;
-import br.com.fiap.SuperBicho.entity.ClinicStatus;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Controller;
@@ -16,6 +14,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Controller
 @RequestMapping("/adm")
@@ -38,8 +37,12 @@ public class AdmWebController {
     @GetMapping("/home")
     public String home(Model model) {
         model.addAttribute("clinics", clinicService.findPending());
-        model.addAttribute("allClinics", clinicService.findAll(Pageable.unpaged()).getContent());
+        model.addAttribute(
+                "allClinics",
+                clinicService.findAll(Pageable.unpaged()).getContent()
+        );
         model.addAttribute("veterinarians", veterinarianService.findAll());
+
         return "adm-home";
     }
 
@@ -65,7 +68,15 @@ public class AdmWebController {
         if (clinic.getClinicStatus() == ClinicStatus.REMOVED) {
             redirectAttributes.addFlashAttribute(
                     "erro",
-                    "Esta clínica já está removida/desativada."
+                    "Esta clínica já foi removida e não pode ser excluída novamente."
+            );
+            return "redirect:/adm/home";
+        }
+
+        if (clinic.getCnpj() == null || clinic.getCnpj().isBlank()) {
+            redirectAttributes.addFlashAttribute(
+                    "erro",
+                    "Não foi possível remover a clínica: o CNPJ não está cadastrado."
             );
             return "redirect:/adm/home";
         }

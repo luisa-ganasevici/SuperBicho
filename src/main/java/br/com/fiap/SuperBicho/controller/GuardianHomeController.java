@@ -108,7 +108,6 @@ public class GuardianHomeController {
         if (result.hasErrors()) {
             model.addAttribute("pets", animalService.findByGuardian(guardian.getId()));
             model.addAttribute("clinics", clinicService.findApproved());
-            model.addAttribute("veterinarians", veterinarianService.findAll());
             return "agendamento";
         }
         appointmentService.create(appointmentDTO);

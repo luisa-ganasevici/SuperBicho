@@ -152,5 +152,31 @@ public class ClinicWebController {
         veterinarianService.deleteByIdForClinic(id, clinic.getId());
         return "redirect:/clinica/veterinarios";
     }
+    @GetMapping("/exame/{id}/cancelar")
+    public String cancelarExameForm(@PathVariable Integer id, Model model) {
+        model.addAttribute("cancelDTO", new CancelRequestDTO());
+        model.addAttribute("targetUrl", "/clinica/exame/" + id + "/cancelar");
+        model.addAttribute("title", "Cancelar exame");
+        return "cancelamento";
+    }
 
+    @PostMapping("/exame/{id}/cancelar")
+    public String cancelarExame(
+            @PathVariable Integer id,
+            @Valid @ModelAttribute("cancelDTO") CancelRequestDTO cancelDTO,
+            BindingResult result,
+            Authentication authentication,
+            Model model) {
+
+        if (result.hasErrors()) {
+            model.addAttribute("targetUrl", "/clinica/exame/" + id + "/cancelar");
+            model.addAttribute("title", "Cancelar exame");
+            return "cancelamento";
+        }
+
+        Clinic clinic = clinicService.findByEmail(authentication.getName());
+        checkUpService.cancelByClinic(id, clinic.getId(), cancelDTO.getReason());
+
+        return "redirect:/clinica/home";
+    }
 }

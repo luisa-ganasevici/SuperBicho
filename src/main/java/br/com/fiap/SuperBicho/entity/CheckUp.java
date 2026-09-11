@@ -34,6 +34,4 @@ public class CheckUp {
     @ManyToOne @JoinColumn(name = "clinic_id")
     private Clinic clinic;
 
-    @ManyToOne @JoinColumn(name = "veterinarian_id")
-    private Veterinarian veterinarian;
 }

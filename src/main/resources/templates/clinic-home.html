@@ -14,7 +14,6 @@
 <table th:unless="${#lists.isEmpty(appointments)}" border="1">
     <tr>
         <th>Pet</th>
-        <th>Veterinário</th>
         <th>Data</th>
         <th>Horário</th>
         <th>Status</th>
@@ -43,7 +42,6 @@
     <tr>
         <th>Pet</th>
         <th>Tipo</th>
-        <th>Veterinário</th>
         <th>Data</th>
         <th>Status</th>
         <th>Motivo do cancelamento</th>
@@ -52,12 +50,20 @@
     <tr th:each="checkUp : ${checkUps}">
         <td th:text="${checkUp.animalName}"></td>
         <td th:text="${checkUp.checkUpType}"></td>
-        <td th:text="${checkUp.veterinarianName}"></td>
         <td th:text="${checkUp.checkUpDate}"></td>
         <td th:text="${checkUp.status}"></td>
         <td th:text="${checkUp.cancelReason}"></td>
         <td th:if="${checkUp.status == 'PENDENTE'}">
-            <form th:action="@{'/clinica/exame/' + ${checkUp.id} + '/concluir'}" method="post" style="display:inline">
+            <form th:action="@{'/clinica/exame/' + ${checkUp.id} + '/concluir'}"
+                  method="post"
+                  style="display:inline">
+                <button type="submit">Concluir</button>
+            </form>
+
+            <a th:href="@{'/clinica/exame/' + ${checkUp.id} + '/cancelar'}">
+                Cancelar
+            </a>
+        </td>
                 <button type="submit">Concluir</button>
             </form>
         </td>

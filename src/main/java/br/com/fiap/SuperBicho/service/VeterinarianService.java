@@ -20,7 +20,6 @@ public class VeterinarianService {
     private final ClinicRepository clinicRepository;
     private final ClinicService clinicService;
     private final AppointmentService appointmentService;
-    private final CheckUpService checkUpService;
 
     private static final String MOTIVO_CANCELAMENTO_VET =
             "Consulta cancelada, favor entrar em contato com a SuperBicho para retirar as dúvidas.";
@@ -30,6 +29,7 @@ public class VeterinarianService {
         veterinarian.setName(dto.getName());
         veterinarian.setSpecialty(dto.getSpecialty());
         veterinarian.setClinic(resolveClinic(dto.getClinicId()));
+
         return toResponse(veterinarianRepository.save(veterinarian));
     }
 
@@ -48,36 +48,56 @@ public class VeterinarianService {
     public void deleteByIdForClinic(Integer id, Integer clinicId) {
         Veterinarian veterinarian = veterinarianRepository.findById(id)
                 .orElseThrow(() -> notFound("Veterinarian"));
+
         if (!veterinarian.getClinic().getId().equals(clinicId)) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Veterinarian does not belong to this clinic");
+            throw new ResponseStatusException(
+                    HttpStatus.FORBIDDEN,
+                    "Veterinarian does not belong to this clinic"
+            );
         }
+
         veterinarianRepository.deleteById(id);
     }
 
     public void deleteByAdmin(Integer id) {
         Veterinarian veterinarian = veterinarianRepository.findById(id)
                 .orElseThrow(() -> notFound("Veterinarian"));
+
         String nome = veterinarian.getName();
         Integer clinicId = veterinarian.getClinic().getId();
 
+        // Mantém a regra: consultas agendadas com este veterinário são canceladas.
         appointmentService.cancelAllByVeterinarian(id, MOTIVO_CANCELAMENTO_VET);
-        checkUpService.cancelAllByVeterinarian(id, MOTIVO_CANCELAMENTO_VET);
-        clinicService.setNotice(clinicId,
-                "Seu veterinário " + nome + " foi excluído. Favor entrar em contato com a SuperBicho.");
+
+        // Exames não são cancelados: eles pertencem somente à clínica.
+        clinicService.setNotice(
+                clinicId,
+                "Seu veterinário " + nome
+                        + " foi excluído. Favor entrar em contato com a SuperBicho."
+        );
 
         veterinarianRepository.deleteById(id);
     }
 
     private Clinic resolveClinic(Integer clinicId) {
-        return clinicRepository.findById(clinicId).orElseThrow(() -> notFound("Clinic"));
+        return clinicRepository.findById(clinicId)
+                .orElseThrow(() -> notFound("Clinic"));
     }
 
     private VeterinarianResponseDTO toResponse(Veterinarian veterinarian) {
-        return new VeterinarianResponseDTO(veterinarian.getId(), veterinarian.getName(),
-                veterinarian.getSpecialty(), veterinarian.getClinic().getId(), veterinarian.getClinic().getName());
+        return new VeterinarianResponseDTO(
+                veterinarian.getId(),
+                veterinarian.getName(),
+                veterinarian.getSpecialty(),
+                veterinarian.getClinic().getId(),
+                veterinarian.getClinic().getName()
+        );
     }
 
     private ResponseStatusException notFound(String resource) {
-        return new ResponseStatusException(HttpStatus.NOT_FOUND, resource + " not found");
+        return new ResponseStatusException(
+                HttpStatus.NOT_FOUND,
+                resource + " not found"
+        );
     }
 }

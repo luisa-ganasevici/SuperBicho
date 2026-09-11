@@ -23,13 +23,7 @@
   <p th:if="${#fields.hasErrors('clinicId')}" th:errors="*{clinicId}"></p>
   <br>
 
-  <label>Veterinário (opcional):
-    <select id="vetSelect" th:field="*{veterinarianId}">
-      <option value="">Nenhum em especial</option>
-      <option th:each="vet : ${veterinarians}" th:value="${vet.id}" th:text="${vet.name}"
-              th:attr="data-clinic=${vet.clinicId}"></option>
-    </select>
-  </label>
+
   <br>
 
   <label>Tipo de exame:

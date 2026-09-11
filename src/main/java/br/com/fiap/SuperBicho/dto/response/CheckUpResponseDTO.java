@@ -16,6 +16,4 @@ public class CheckUpResponseDTO {
     private String animalName;
     private Integer clinicId;
     private String clinicName;
-    private Integer veterinarianId;
-    private String veterinarianName;
 }

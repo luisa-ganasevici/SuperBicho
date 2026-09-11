@@ -12,7 +12,6 @@
 <table th:unless="${#lists.isEmpty(appointments)}" border="1">
     <tr>
         <th>Clínica</th>
-        <th>Veterinário</th>
         <th>Data</th>
         <th>Horário</th>
         <th>Status</th>
@@ -42,7 +41,6 @@
     <tr th:each="checkUp : ${checkUps}">
         <td th:text="${checkUp.checkUpType}"></td>
         <td th:text="${checkUp.clinicName}"></td>
-        <td th:text="${checkUp.veterinarianName}"></td>
         <td th:text="${checkUp.checkUpDate}"></td>
         <td th:text="${checkUp.status}"></td>
         <td th:text="${checkUp.cancelReason}"></td>

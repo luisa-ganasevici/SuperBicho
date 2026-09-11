@@ -42,7 +42,6 @@ public class CheckUpService {
         checkUp.setStatus(dto.getStatus());
         checkUp.setAnimal(resolveAnimal(dto.getAnimalId()));
         checkUp.setClinic(resolveClinic(dto.getClinicId()));
-        checkUp.setVeterinarian(resolveVeterinarian(dto.getVeterinarianId()));
         CheckUp saved = checkUpRepository.save(checkUp);
 
         History history = new History();
@@ -63,7 +62,6 @@ public class CheckUpService {
         checkUp.setStatus(dto.getStatus());
         checkUp.setAnimal(resolveAnimal(dto.getAnimalId()));
         checkUp.setClinic(resolveClinic(dto.getClinicId()));
-        checkUp.setVeterinarian(resolveVeterinarian(dto.getVeterinarianId()));
         return toResponse(checkUpRepository.save(checkUp));
     }
 
@@ -86,19 +84,19 @@ public class CheckUpService {
         return clinicRepository.findById(clinicId).orElseThrow(() -> notFound("Clinic"));
     }
 
-    private Veterinarian resolveVeterinarian(Integer veterinarianId) {
-        if (veterinarianId == null) return null;
-        return veterinarianRepository.findById(veterinarianId).orElseThrow(() -> notFound("Veterinarian"));
-    }
 
     private CheckUpResponseDTO toResponse(CheckUp checkUp) {
-        return new CheckUpResponseDTO(checkUp.getId(), checkUp.getCheckUpType(), checkUp.getCheckUpDate(),
-                checkUp.getStatus(), checkUp.getCancelReason(),
-                checkUp.getAnimal().getId(), checkUp.getAnimal().getName(),
+        return new CheckUpResponseDTO(
+                checkUp.getId(),
+                checkUp.getCheckUpType(),
+                checkUp.getCheckUpDate(),
+                checkUp.getStatus(),
+                checkUp.getCancelReason(),
+                checkUp.getAnimal().getId(),
+                checkUp.getAnimal().getName(),
                 checkUp.getClinic() != null ? checkUp.getClinic().getId() : null,
-                checkUp.getClinic() != null ? checkUp.getClinic().getName() : null,
-                checkUp.getVeterinarian() != null ? checkUp.getVeterinarian().getId() : null,
-                checkUp.getVeterinarian() != null ? checkUp.getVeterinarian().getName() : null);
+                checkUp.getClinic() != null ? checkUp.getClinic().getName() : null
+        );
     }
 
     private ResponseStatusException notFound(String resource) {
@@ -139,8 +137,28 @@ public class CheckUpService {
     @CacheEvict(value = {"checkUps", "checkUpById"}, allEntries = true)
     public CheckUpResponseDTO completeByClinic(Integer id, Integer clinicId) {
         CheckUp checkUp = findEntityById(id);
+
         if (checkUp.getClinic() == null || !checkUp.getClinic().getId().equals(clinicId)) throw forbidden();
         checkUp.setStatus(STATUS_COMPLETED);
+        return toResponse(checkUpRepository.save(checkUp));
+    }
+
+    @CacheEvict(value = {"checkUps", "checkUpById"}, allEntries = true)
+    public CheckUpResponseDTO cancelByClinic(
+            Integer id,
+            Integer clinicId,
+            String reason) {
+
+        CheckUp checkUp = findEntityById(id);
+
+        if (checkUp.getClinic() == null
+                || !checkUp.getClinic().getId().equals(clinicId)) {
+            throw forbidden();
+        }
+
+        checkUp.setStatus(STATUS_CANCELED);
+        checkUp.setCancelReason(reason);
+
         return toResponse(checkUpRepository.save(checkUp));
     }
 
@@ -155,15 +173,5 @@ public class CheckUpService {
                 });
     }
 
-    @CacheEvict(value = {"checkUps", "checkUpById"}, allEntries = true)
-    public void cancelAllByVeterinarian(Integer veterinarianId, String reason) {
-        checkUpRepository.findByVeterinarianId(veterinarianId).stream()
-                .filter(c -> STATUS_PENDING.equals(c.getStatus()))
-                .forEach(c -> {
-                    c.setStatus(STATUS_CANCELED);
-                    c.setCancelReason(reason);
-                    c.setVeterinarian(null);
-                    checkUpRepository.save(c);
-                });
-    }
+
 }
