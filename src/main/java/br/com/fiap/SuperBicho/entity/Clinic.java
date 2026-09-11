@@ -47,4 +47,7 @@ public class Clinic {
     @Enumerated(EnumType.STRING)
     private ClinicStatus clinicStatus;
 
+    @Column(name = "notice", length = 500)
+    private String notice;
+
 }

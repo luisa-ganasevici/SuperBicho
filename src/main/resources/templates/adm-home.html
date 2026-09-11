@@ -5,6 +5,8 @@
     <title>SuperBicho - Painel Admin</title>
 </head>
 <body>
+<p th:if="${erro}" style="color:red" th:text="${erro}"></p>
+
 <h1>Clínicas pendentes de aprovação</h1>
 
 <p th:if="${#lists.isEmpty(clinics)}">Nenhuma clínica pendente no momento.</p>
@@ -32,6 +34,61 @@
         </td>
     </tr>
 </table>
+
+<h1>Todas as clínicas</h1>
+<p th:if="${#lists.isEmpty(allClinics)}">Nenhuma clínica cadastrada.</p>
+<table th:unless="${#lists.isEmpty(allClinics)}" border="1">
+    <tr>
+        <th>Nome</th>
+        <th>Email</th>
+        <th>Status</th>
+        <th>Ações</th>
+    </tr>
+    <tr th:each="clinic : ${allClinics}">
+        <td th:text="${clinic.name}"></td>
+        <td th:text="${clinic.email}"></td>
+        <td th:text="${clinic.clinicStatus}"></td>
+        <td>
+            <form th:action="@{/adm/clinica/{id}/excluir(id=${clinic.id})}" method="post" style="display:inline"
+                  onsubmit="return confirm('Excluir esta clínica?');">
+                <button type="submit">Excluir</button>
+            </form>
+        </td>
+    </tr>
+</table>
+
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>SuperBicho - Status da Clínica</title>
+</head>
+<body>
+<h1>Olá, <span th:text="${clinic.name}">Clínica</span></h1>
+
+<p th:if="${notice}" style="color:red; font-weight:bold" th:text="${notice}"></p>
+
+<div th:if="${clinic.clinicStatus.name() == 'PENDING'}">
+    <p>Sua clínica está sendo analisada para aprovação de credenciados. Por favor, aguarde.</p>
+</div>
+
+<div th:if="${clinic.clinicStatus.name() == 'APPROVED'}">
+    <p>Sua clínica foi aprovada! Bem-vinda ao SuperBicho.</p>
+    <a th:href="@{/clinica/home}">Acessar painel</a>
+</div>
+
+<div th:if="${clinic.clinicStatus.name() == 'DENIED'}">
+    <p>Seu cadastro não foi aprovado. Entre em contato com o suporte para mais informações.</p>
+</div>
+
+<div th:if="${clinic.clinicStatus.name() == 'REMOVED'}">
+    <p>Sua clínica foi desativada do cadastro da SuperBicho. Caso tenha dúvidas, entre em contato conosco.</p>
+</div>
+<form th:action="@{/clinica/logout}" method="post">
+    <button type="submit">logout</button>
+</form>
+</body>
+</html>
 <form th:action="@{/adm/logout}" method="post">
     <button type="submit">logout</button>
 </form>

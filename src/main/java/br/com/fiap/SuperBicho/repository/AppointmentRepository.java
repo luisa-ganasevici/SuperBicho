@@ -8,4 +8,5 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Intege
     List<Appointment> findByAnimal_GuardianId(Integer guardianId);
     List<Appointment> findByClinicId(Integer clinicId);
     List<Appointment> findByAnimalId(Integer animalId);
+    List<Appointment> findByVeterinarianId(Integer veterinarianId);
 }

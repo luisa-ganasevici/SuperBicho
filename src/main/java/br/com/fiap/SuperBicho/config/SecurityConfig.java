@@ -59,7 +59,8 @@ public class SecurityConfig {
                 .authenticationProvider(providerFor(clinicUserDetailsService))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/clinica/login", "/clinica/cadastro").permitAll()
-                        .requestMatchers("/clinica/status").hasAnyRole("CLINICA_PENDING", "CLINICA_APPROVED", "CLINICA_DENIED")
+                        .requestMatchers("/clinica/status").hasAnyRole("CLINICA_PENDING",
+                                "CLINICA_APPROVED", "CLINICA_DENIED", "CLINICA_REMOVED")
                         .requestMatchers("/clinica/home").hasRole("CLINICA_APPROVED")
                         .anyRequest().hasRole("CLINICA_APPROVED"))
                 .formLogin(form -> form

@@ -30,10 +30,17 @@
     <tr>
         <th>Nome</th>
         <th>Especialidade</th>
+        <th>Ações</th>
     </tr>
     <tr th:each="vet : ${veterinarians}">
         <td th:text="${vet.name}"></td>
         <td th:text="${vet.specialty}"></td>
+        <td>
+            <form th:action="@{/clinica/veterinarios/{id}/excluir(id=${vet.id})}" method="post" style="display:inline"
+                  onsubmit="return confirm('Excluir este veterinário?');">
+                <button type="submit">Excluir</button>
+            </form>
+        </td>
     </tr>
 </table>
 

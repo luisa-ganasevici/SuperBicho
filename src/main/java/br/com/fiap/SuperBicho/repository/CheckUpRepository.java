@@ -8,4 +8,5 @@ public interface CheckUpRepository extends JpaRepository<CheckUp, Integer> {
     List<CheckUp> findByAnimal_GuardianId(Integer guardianId);
     List<CheckUp> findByClinicId(Integer clinicId);
     List<CheckUp> findByAnimalId(Integer animalId);
+    List<CheckUp> findByVeterinarianId(Integer veterinarianId);
 }

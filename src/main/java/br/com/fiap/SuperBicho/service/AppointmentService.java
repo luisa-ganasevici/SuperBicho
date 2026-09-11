@@ -150,4 +150,27 @@ public class AppointmentService {
         appointment.setStatus(STATUS_COMPLETED);
         return toResponse(appointmentRepository.save(appointment));
     }
+
+    @CacheEvict(value = {"appointments", "appointmentById"}, allEntries = true)
+    public void cancelAllByClinic(Integer clinicId, String reason) {
+        appointmentRepository.findByClinicId(clinicId).stream()
+                .filter(a -> STATUS_SCHEDULED.equals(a.getStatus()))
+                .forEach(a -> {
+                    a.setStatus(STATUS_CANCELED);
+                    a.setCancelReason(reason);
+                    appointmentRepository.save(a);
+                });
+    }
+
+    @CacheEvict(value = {"appointments", "appointmentById"}, allEntries = true)
+    public void cancelAllByVeterinarian(Integer veterinarianId, String reason) {
+        appointmentRepository.findByVeterinarianId(veterinarianId).stream()
+                .filter(a -> STATUS_SCHEDULED.equals(a.getStatus()))
+                .forEach(a -> {
+                    a.setStatus(STATUS_CANCELED);
+                    a.setCancelReason(reason);
+                    a.setVeterinarian(null);
+                    appointmentRepository.save(a);
+                });
+    }
 }

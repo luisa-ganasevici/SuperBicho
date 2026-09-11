@@ -78,6 +78,28 @@ public class ClinicService {
     }
 
     @CacheEvict(value = {"clinics", "clinicById"}, allEntries = true)
+    public Clinic disable(Integer id) {
+        Clinic clinic = findEntityById(id);
+        clinic.setClinicStatus(ClinicStatus.REMOVED);
+        clinic.setNotice("Sua clínica foi desativada do cadastro da SuperBicho. Caso tenha dúvidas, entre em contato conosco.");
+        return clinicRepository.save(clinic);
+    }
+
+    @CacheEvict(value = {"clinics", "clinicById"}, allEntries = true)
+    public void setNotice(Integer id, String notice) {
+        Clinic clinic = findEntityById(id);
+        clinic.setNotice(notice);
+        clinicRepository.save(clinic);
+    }
+
+    @CacheEvict(value = {"clinics", "clinicById"}, allEntries = true)
+    public void clearNotice(Integer id) {
+        Clinic clinic = findEntityById(id);
+        clinic.setNotice(null);
+        clinicRepository.save(clinic);
+    }
+
+    @CacheEvict(value = {"clinics", "clinicById"}, allEntries = true)
     public Clinic approve(Integer id) {
         Clinic clinic = findEntityById(id);
         clinic.setClinicStatus(ClinicStatus.APPROVED);

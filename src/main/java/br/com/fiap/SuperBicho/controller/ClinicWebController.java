@@ -57,6 +57,11 @@ public class ClinicWebController {
     public String status(Model model, Authentication authentication) {
         Clinic clinic = clinicService.findByEmail(authentication.getName());
         model.addAttribute("clinic", clinic);
+        String notice = clinic.getNotice();
+        model.addAttribute("notice", notice);
+        if (notice != null) {
+            clinicService.clearNotice(clinic.getId());
+        }
         return "clinic-status";
     }
 
@@ -138,6 +143,13 @@ public class ClinicWebController {
             return "clinic-veterinarios";
         }
         veterinarianService.create(veterinarianDTO);
+        return "redirect:/clinica/veterinarios";
+    }
+
+    @PostMapping("/veterinarios/{id}/excluir")
+    public String excluirVeterinario(@PathVariable Integer id, Authentication authentication) {
+        Clinic clinic = clinicService.findByEmail(authentication.getName());
+        veterinarianService.deleteByIdForClinic(id, clinic.getId());
         return "redirect:/clinica/veterinarios";
     }
 

@@ -143,4 +143,27 @@ public class CheckUpService {
         checkUp.setStatus(STATUS_COMPLETED);
         return toResponse(checkUpRepository.save(checkUp));
     }
+
+    @CacheEvict(value = {"checkUps", "checkUpById"}, allEntries = true)
+    public void cancelAllByClinic(Integer clinicId, String reason) {
+        checkUpRepository.findByClinicId(clinicId).stream()
+                .filter(c -> STATUS_PENDING.equals(c.getStatus()))
+                .forEach(c -> {
+                    c.setStatus(STATUS_CANCELED);
+                    c.setCancelReason(reason);
+                    checkUpRepository.save(c);
+                });
+    }
+
+    @CacheEvict(value = {"checkUps", "checkUpById"}, allEntries = true)
+    public void cancelAllByVeterinarian(Integer veterinarianId, String reason) {
+        checkUpRepository.findByVeterinarianId(veterinarianId).stream()
+                .filter(c -> STATUS_PENDING.equals(c.getStatus()))
+                .forEach(c -> {
+                    c.setStatus(STATUS_CANCELED);
+                    c.setCancelReason(reason);
+                    c.setVeterinarian(null);
+                    checkUpRepository.save(c);
+                });
+    }
 }

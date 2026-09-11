@@ -11,4 +11,5 @@ public class VeterinarianResponseDTO {
     private String name;
     private String specialty;
     private Integer clinicId;
+    private String clinicName;
 }

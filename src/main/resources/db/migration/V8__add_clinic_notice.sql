@@ -1,0 +1,3 @@
+ALTER TABLE SB_TB_CLINIC ADD (
+    notice VARCHAR2(500)
+);
