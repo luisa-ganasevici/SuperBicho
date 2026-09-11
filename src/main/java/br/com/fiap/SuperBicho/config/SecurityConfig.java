@@ -97,7 +97,15 @@ public class SecurityConfig {
                 .securityContext(context -> context.securityContextRepository(tutorRepo))
                 .authenticationProvider(providerFor(guardianUserDetailsService))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/", "/login", "/cadastro", "/css/**", "/js/**", "/images/**").permitAll()
+                        .requestMatchers(
+                                "/",
+                                "/login",
+                                "/cadastro",
+                                "/css/**",
+                                "/js/**",
+                                "/images/**",
+                                "/error"
+                        ).permitAll()
                         .anyRequest().hasRole("TUTOR"))
                 .formLogin(form -> form
                         .loginPage("/login")

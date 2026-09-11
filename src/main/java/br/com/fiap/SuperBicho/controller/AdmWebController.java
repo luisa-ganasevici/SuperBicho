@@ -5,6 +5,9 @@ import br.com.fiap.SuperBicho.service.AppointmentService;
 import br.com.fiap.SuperBicho.service.CheckUpService;
 import br.com.fiap.SuperBicho.service.ClinicService;
 import br.com.fiap.SuperBicho.service.VeterinarianService;
+import br.com.fiap.SuperBicho.entity.Clinic;
+import br.com.fiap.SuperBicho.entity.ClinicStatus;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Controller;
@@ -53,10 +56,24 @@ public class AdmWebController {
     }
 
     @PostMapping("/clinica/{id}/excluir")
-    public String excluirClinica(@PathVariable Integer id) {
+    public String excluirClinica(
+            @PathVariable Integer id,
+            RedirectAttributes redirectAttributes) {
+
+        Clinic clinic = clinicService.findEntityById(id);
+
+        if (clinic.getClinicStatus() == ClinicStatus.REMOVED) {
+            redirectAttributes.addFlashAttribute(
+                    "erro",
+                    "Esta clínica já está removida/desativada."
+            );
+            return "redirect:/adm/home";
+        }
+
         appointmentService.cancelAllByClinic(id, MOTIVO_CANCELAMENTO_CLINICA);
         checkUpService.cancelAllByClinic(id, MOTIVO_CANCELAMENTO_CLINICA);
         clinicService.disable(id);
+
         return "redirect:/adm/home";
     }
 
