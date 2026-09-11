@@ -16,10 +16,15 @@ import java.util.List;
 @Service @RequiredArgsConstructor
 public class AppointmentService {
 
+    public static final String STATUS_SCHEDULED = "AGENDADO";
+    public static final String STATUS_CANCELED = "CANCELADO";
+    public static final String STATUS_COMPLETED = "CONCLUIDO";
+
     private final AppointmentRepository appointmentRepository;
     private final HistoryRepository historyRepository;
     private final AnimalRepository animalRepository;
     private final ClinicRepository clinicRepository;
+    private final VeterinarianRepository veterinarianRepository;
 
     @Cacheable("appointments")
     public Page<AppointmentResponseDTO> findAll(Pageable pageable) {
@@ -37,6 +42,7 @@ public class AppointmentService {
         appointment.setStatus(dto.getStatus());
         appointment.setAnimal(resolveAnimal(dto.getAnimalId()));
         appointment.setClinic(resolveClinic(dto.getClinicId()));
+        appointment.setVeterinarian(resolveVeterinarian(dto.getVeterinarianId()));
         Appointment saved = appointmentRepository.save(appointment);
 
         History history = new History();
@@ -57,6 +63,7 @@ public class AppointmentService {
         appointment.setStatus(dto.getStatus());
         appointment.setAnimal(resolveAnimal(dto.getAnimalId()));
         appointment.setClinic(resolveClinic(dto.getClinicId()));
+        appointment.setVeterinarian(resolveVeterinarian(dto.getVeterinarianId()));
         return toResponse(appointmentRepository.save(appointment));
     }
 
@@ -78,17 +85,29 @@ public class AppointmentService {
         return clinicRepository.findById(clinicId).orElseThrow(() -> notFound("Clinic"));
     }
 
+    private Veterinarian resolveVeterinarian(Integer veterinarianId) {
+        if (veterinarianId == null) return null;
+        return veterinarianRepository.findById(veterinarianId).orElseThrow(() -> notFound("Veterinarian"));
+    }
+
     private AppointmentResponseDTO toResponse(Appointment appointment) {
         return new AppointmentResponseDTO(appointment.getId(), appointment.getDate(), appointment.getTime(),
-                appointment.getStatus(), appointment.getAnimal().getId(), appointment.getAnimal().getName(),
-                appointment.getClinic().getId(), appointment.getClinic().getName());
+                appointment.getStatus(), appointment.getCancelReason(),
+                appointment.getAnimal().getId(), appointment.getAnimal().getName(),
+                appointment.getClinic().getId(), appointment.getClinic().getName(),
+                appointment.getVeterinarian() != null ? appointment.getVeterinarian().getId() : null,
+                appointment.getVeterinarian() != null ? appointment.getVeterinarian().getName() : null);
     }
 
     private ResponseStatusException notFound(String resource) {
         return new ResponseStatusException(HttpStatus.NOT_FOUND, resource + " not found");
     }
 
-    public  List<AppointmentResponseDTO> findByGuardian(Integer guardianId) {
+    private ResponseStatusException forbidden() {
+        return new ResponseStatusException(HttpStatus.FORBIDDEN, "You are not allowed to change this appointment");
+    }
+
+    public List<AppointmentResponseDTO> findByGuardian(Integer guardianId) {
         return appointmentRepository.findByAnimal_GuardianId(guardianId).stream()
                 .map(this::toResponse)
                 .toList();
@@ -98,5 +117,37 @@ public class AppointmentService {
         return appointmentRepository.findByClinicId(clinicId).stream()
                 .map(this::toResponse)
                 .toList();
+    }
+
+    public List<AppointmentResponseDTO> findByAnimal(Integer animalId) {
+        return appointmentRepository.findByAnimalId(animalId).stream()
+                .map(this::toResponse)
+                .toList();
+    }
+
+    @CacheEvict(value = {"appointments", "appointmentById"}, allEntries = true)
+    public AppointmentResponseDTO cancelByGuardian(Integer id, Integer guardianId, String reason) {
+        Appointment appointment = findEntityById(id);
+        if (!appointment.getAnimal().getGuardian().getId().equals(guardianId)) throw forbidden();
+        appointment.setStatus(STATUS_CANCELED);
+        appointment.setCancelReason(reason);
+        return toResponse(appointmentRepository.save(appointment));
+    }
+
+    @CacheEvict(value = {"appointments", "appointmentById"}, allEntries = true)
+    public AppointmentResponseDTO cancelByClinic(Integer id, Integer clinicId, String reason) {
+        Appointment appointment = findEntityById(id);
+        if (!appointment.getClinic().getId().equals(clinicId)) throw forbidden();
+        appointment.setStatus(STATUS_CANCELED);
+        appointment.setCancelReason(reason);
+        return toResponse(appointmentRepository.save(appointment));
+    }
+
+    @CacheEvict(value = {"appointments", "appointmentById"}, allEntries = true)
+    public AppointmentResponseDTO completeByClinic(Integer id, Integer clinicId) {
+        Appointment appointment = findEntityById(id);
+        if (!appointment.getClinic().getId().equals(clinicId)) throw forbidden();
+        appointment.setStatus(STATUS_COMPLETED);
+        return toResponse(appointmentRepository.save(appointment));
     }
 }

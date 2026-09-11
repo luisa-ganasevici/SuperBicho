@@ -14,8 +14,8 @@ public class CheckUp {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-
     private Integer id;
+
     @NotBlank(message = "É necessario informar o tipo de exame ")
     private String checkUpType;
 
@@ -25,9 +25,15 @@ public class CheckUp {
     @NotBlank(message = "É necessario informar o status")
     private String status;
 
-    @NotBlank(message = "É necessario informar as observações")
-    private String notes;
+    @Column(name = "cancel_reason")
+    private String cancelReason;
 
     @ManyToOne @JoinColumn(name = "animal_id")
     private Animal animal;
+
+    @ManyToOne @JoinColumn(name = "clinic_id")
+    private Clinic clinic;
+
+    @ManyToOne @JoinColumn(name = "veterinarian_id")
+    private Veterinarian veterinarian;
 }

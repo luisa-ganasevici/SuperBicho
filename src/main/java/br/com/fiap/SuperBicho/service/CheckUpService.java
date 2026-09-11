@@ -16,9 +16,15 @@ import java.util.List;
 @Service @RequiredArgsConstructor
 public class CheckUpService {
 
+    public static final String STATUS_PENDING = "PENDENTE";
+    public static final String STATUS_CANCELED = "CANCELADO";
+    public static final String STATUS_COMPLETED = "CONCLUIDO";
+
     private final CheckUpRepository checkUpRepository;
     private final HistoryRepository historyRepository;
     private final AnimalRepository animalRepository;
+    private final ClinicRepository clinicRepository;
+    private final VeterinarianRepository veterinarianRepository;
 
     @Cacheable("checkUps")
     public Page<CheckUpResponseDTO> findAll(Pageable pageable) {
@@ -34,8 +40,9 @@ public class CheckUpService {
         checkUp.setCheckUpType(dto.getCheckUpType());
         checkUp.setCheckUpDate(dto.getCheckUpDate());
         checkUp.setStatus(dto.getStatus());
-        checkUp.setNotes(dto.getNotes());
         checkUp.setAnimal(resolveAnimal(dto.getAnimalId()));
+        checkUp.setClinic(resolveClinic(dto.getClinicId()));
+        checkUp.setVeterinarian(resolveVeterinarian(dto.getVeterinarianId()));
         CheckUp saved = checkUpRepository.save(checkUp);
 
         History history = new History();
@@ -54,8 +61,9 @@ public class CheckUpService {
         checkUp.setCheckUpType(dto.getCheckUpType());
         checkUp.setCheckUpDate(dto.getCheckUpDate());
         checkUp.setStatus(dto.getStatus());
-        checkUp.setNotes(dto.getNotes());
         checkUp.setAnimal(resolveAnimal(dto.getAnimalId()));
+        checkUp.setClinic(resolveClinic(dto.getClinicId()));
+        checkUp.setVeterinarian(resolveVeterinarian(dto.getVeterinarianId()));
         return toResponse(checkUpRepository.save(checkUp));
     }
 
@@ -73,18 +81,66 @@ public class CheckUpService {
         return animalRepository.findById(animalId).orElseThrow(() -> notFound("Animal"));
     }
 
+    private Clinic resolveClinic(Integer clinicId) {
+        if (clinicId == null) return null;
+        return clinicRepository.findById(clinicId).orElseThrow(() -> notFound("Clinic"));
+    }
+
+    private Veterinarian resolveVeterinarian(Integer veterinarianId) {
+        if (veterinarianId == null) return null;
+        return veterinarianRepository.findById(veterinarianId).orElseThrow(() -> notFound("Veterinarian"));
+    }
+
     private CheckUpResponseDTO toResponse(CheckUp checkUp) {
         return new CheckUpResponseDTO(checkUp.getId(), checkUp.getCheckUpType(), checkUp.getCheckUpDate(),
-                checkUp.getStatus(), checkUp.getNotes(), checkUp.getAnimal().getId(), checkUp.getAnimal().getName());
+                checkUp.getStatus(), checkUp.getCancelReason(),
+                checkUp.getAnimal().getId(), checkUp.getAnimal().getName(),
+                checkUp.getClinic() != null ? checkUp.getClinic().getId() : null,
+                checkUp.getClinic() != null ? checkUp.getClinic().getName() : null,
+                checkUp.getVeterinarian() != null ? checkUp.getVeterinarian().getId() : null,
+                checkUp.getVeterinarian() != null ? checkUp.getVeterinarian().getName() : null);
     }
 
     private ResponseStatusException notFound(String resource) {
         return new ResponseStatusException(HttpStatus.NOT_FOUND, resource + " not found");
     }
 
+    private ResponseStatusException forbidden() {
+        return new ResponseStatusException(HttpStatus.FORBIDDEN, "You are not allowed to change this check-up");
+    }
+
     public List<CheckUpResponseDTO> findByGuardian(Integer guardianId) {
         return checkUpRepository.findByAnimal_GuardianId(guardianId).stream()
                 .map(this::toResponse)
                 .toList();
+    }
+
+    public List<CheckUpResponseDTO> findByClinic(Integer clinicId) {
+        return checkUpRepository.findByClinicId(clinicId).stream()
+                .map(this::toResponse)
+                .toList();
+    }
+
+    public List<CheckUpResponseDTO> findByAnimal(Integer animalId) {
+        return checkUpRepository.findByAnimalId(animalId).stream()
+                .map(this::toResponse)
+                .toList();
+    }
+
+    @CacheEvict(value = {"checkUps", "checkUpById"}, allEntries = true)
+    public CheckUpResponseDTO cancelByGuardian(Integer id, Integer guardianId, String reason) {
+        CheckUp checkUp = findEntityById(id);
+        if (!checkUp.getAnimal().getGuardian().getId().equals(guardianId)) throw forbidden();
+        checkUp.setStatus(STATUS_CANCELED);
+        checkUp.setCancelReason(reason);
+        return toResponse(checkUpRepository.save(checkUp));
+    }
+
+    @CacheEvict(value = {"checkUps", "checkUpById"}, allEntries = true)
+    public CheckUpResponseDTO completeByClinic(Integer id, Integer clinicId) {
+        CheckUp checkUp = findEntityById(id);
+        if (checkUp.getClinic() == null || !checkUp.getClinic().getId().equals(clinicId)) throw forbidden();
+        checkUp.setStatus(STATUS_COMPLETED);
+        return toResponse(checkUpRepository.save(checkUp));
     }
 }

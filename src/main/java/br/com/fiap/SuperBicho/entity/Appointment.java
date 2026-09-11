@@ -25,6 +25,9 @@ public class Appointment {
     @NotBlank(message = "É preciso informar o status")
     private String status;
 
+    @Column(name = "cancel_reason")
+    private String cancelReason;
+
     @ManyToOne
     @JoinColumn(name = "animal_id")
     private Animal animal;
@@ -32,4 +35,8 @@ public class Appointment {
     @ManyToOne
     @JoinColumn(name = "clinic_id")
     private Clinic clinic;
+
+    @ManyToOne
+    @JoinColumn(name = "veterinarian_id")
+    private Veterinarian veterinarian;
 }

@@ -16,11 +16,21 @@
   <br>
 
   <label>Clínica:
-    <select th:field="*{clinicId}">
+    <select id="clinicSelect" th:field="*{clinicId}" onchange="filterVets()">
       <option th:each="clinic : ${clinics}" th:value="${clinic.id}" th:text="${clinic.name}"></option>
     </select>
   </label>
   <p th:if="${#fields.hasErrors('clinicId')}" th:errors="*{clinicId}"></p>
+  <br>
+
+  <label>Veterinário (opcional):
+    <select id="vetSelect" th:field="*{veterinarianId}">
+      <option value="">Nenhum em especial</option>
+      <option th:each="vet : ${veterinarians}" th:value="${vet.id}"
+              th:text="${vet.name} + ' - ' + ${vet.specialty}"
+              th:attr="data-clinic=${vet.clinicId}"></option>
+    </select>
+  </label>
   <br>
 
   <label>Data:
@@ -39,5 +49,19 @@
 </form>
 
 <br><a th:href="@{/guardian/home}">Voltar</a>
+
+<script th:inline="javascript">
+  function filterVets() {
+    var clinicId = document.getElementById('clinicSelect').value;
+    var options = document.getElementById('vetSelect').options;
+    for (var i = 0; i < options.length; i++) {
+      var opt = options[i];
+      var vetClinic = opt.getAttribute('data-clinic');
+      if (vetClinic === null) { opt.hidden = false; continue; }
+      opt.hidden = (vetClinic !== clinicId);
+    }
+  }
+  document.addEventListener('DOMContentLoaded', filterVets);
+</script>
 </body>
 </html>

@@ -11,7 +11,11 @@ public class CheckUpResponseDTO {
     private String checkUpType;
     private String checkUpDate;
     private String status;
-    private String notes;
+    private String cancelReason;
     private Integer animalId;
     private String animalName;
+    private Integer clinicId;
+    private String clinicName;
+    private Integer veterinarianId;
+    private String veterinarianName;
 }

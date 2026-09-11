@@ -2,11 +2,16 @@ package br.com.fiap.SuperBicho.controller;
 
 import br.com.fiap.SuperBicho.dto.request.AnimalRequestDTO;
 import br.com.fiap.SuperBicho.dto.request.AppointmentRequestDTO;
+import br.com.fiap.SuperBicho.dto.request.CancelRequestDTO;
+import br.com.fiap.SuperBicho.dto.request.CheckUpRequestDTO;
+import br.com.fiap.SuperBicho.entity.Animal;
 import br.com.fiap.SuperBicho.entity.Guardian;
 import br.com.fiap.SuperBicho.service.AnimalService;
 import br.com.fiap.SuperBicho.service.AppointmentService;
+import br.com.fiap.SuperBicho.service.CheckUpService;
 import br.com.fiap.SuperBicho.service.ClinicService;
 import br.com.fiap.SuperBicho.service.GuardianService;
+import br.com.fiap.SuperBicho.service.VeterinarianService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
@@ -14,8 +19,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
-import br.com.fiap.SuperBicho.dto.request.CheckUpRequestDTO;
-import br.com.fiap.SuperBicho.service.CheckUpService;
+import org.springframework.web.server.ResponseStatusException;
+import org.springframework.http.HttpStatus;
 
 @Controller
 @RequestMapping("/guardian")
@@ -27,6 +32,7 @@ public class GuardianHomeController {
     private final AppointmentService appointmentService;
     private final ClinicService clinicService;
     private final CheckUpService checkUpService;
+    private final VeterinarianService veterinarianService;
 
     @ModelAttribute("animalDTO")
     public AnimalRequestDTO prepareAnimalDTO(Authentication authentication) {
@@ -59,10 +65,23 @@ public class GuardianHomeController {
         return "redirect:/guardian/home";
     }
 
+    @GetMapping("/pet/{id}/historico")
+    public String petHistory(@PathVariable Integer id, Model model, Authentication authentication) {
+        Guardian guardian = guardianService.findByEmail(authentication.getName());
+        Animal animal = animalService.findEntityById(id);
+        if (!animal.getGuardian().getId().equals(guardian.getId())) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "This pet does not belong to you");
+        }
+        model.addAttribute("animal", animal);
+        model.addAttribute("appointments", appointmentService.findByAnimal(id));
+        model.addAttribute("checkUps", checkUpService.findByAnimal(id));
+        return "historico-animal";
+    }
+
     @ModelAttribute("appointmentDTO")
     public AppointmentRequestDTO prepareAppointmentDTO() {
         AppointmentRequestDTO dto = new AppointmentRequestDTO();
-        dto.setStatus("AGENDADO");
+        dto.setStatus(AppointmentService.STATUS_SCHEDULED);
         return dto;
     }
 
@@ -71,9 +90,8 @@ public class GuardianHomeController {
         Guardian guardian = guardianService.findByEmail(authentication.getName());
         model.addAttribute("pets", animalService.findByGuardian(guardian.getId()));
         model.addAttribute("clinics", clinicService.findApproved());
+        model.addAttribute("veterinarians", veterinarianService.findAll());
         return "agendamento";
-
-
     }
 
     @PostMapping("/agendamento")
@@ -87,32 +105,51 @@ public class GuardianHomeController {
             result.rejectValue("animalId", "invalid", "Pet inválido");
         }
 
-        System.out.println("=== DEBUG AGENDAMENTO ===");
-        System.out.println("guardian logado id=" + guardian.getId() + " email=" + guardian.getEmail());
-        System.out.println("animalId enviado=" + appointmentDTO.getAnimalId());
-        System.out.println("petPertenceAoTutor=" + petPertenceAoTutor);
-        System.out.println("hasErrors=" + result.hasErrors());
-        result.getAllErrors().forEach(e -> System.out.println("erro: " + e.getDefaultMessage()));
-        System.out.println("=========================");
-
         if (result.hasErrors()) {
             model.addAttribute("pets", animalService.findByGuardian(guardian.getId()));
             model.addAttribute("clinics", clinicService.findApproved());
+            model.addAttribute("veterinarians", veterinarianService.findAll());
             return "agendamento";
         }
         appointmentService.create(appointmentDTO);
         return "redirect:/guardian/home";
     }
+
+    @PostMapping("/agendamento/{id}/cancelar")
+    public String agendamentoCancelar(@PathVariable Integer id,
+                                       @Valid @ModelAttribute("cancelDTO") CancelRequestDTO cancelDTO,
+                                       BindingResult result, Authentication authentication, Model model) {
+        if (result.hasErrors()) {
+            model.addAttribute("targetUrl", "/guardian/agendamento/" + id + "/cancelar");
+            model.addAttribute("title", "Cancelar agendamento");
+            return "cancelamento";
+        }
+        Guardian guardian = guardianService.findByEmail(authentication.getName());
+        appointmentService.cancelByGuardian(id, guardian.getId(), cancelDTO.getReason());
+        return "redirect:/guardian/home";
+    }
+
+    @GetMapping("/agendamento/{id}/cancelar")
+    public String agendamentoCancelarForm(@PathVariable Integer id, Model model) {
+        model.addAttribute("cancelDTO", new CancelRequestDTO());
+        model.addAttribute("targetUrl", "/guardian/agendamento/" + id + "/cancelar");
+        model.addAttribute("title", "Cancelar agendamento");
+        return "cancelamento";
+    }
+
     @ModelAttribute("checkUpDTO")
     public CheckUpRequestDTO prepareCheckUpDTO() {
         CheckUpRequestDTO dto = new CheckUpRequestDTO();
-        dto.setStatus("PENDENTE");
+        dto.setStatus(CheckUpService.STATUS_PENDING);
         return dto;
     }
+
     @GetMapping("/exame")
     public String exameForm(Model model, Authentication authentication) {
         Guardian guardian = guardianService.findByEmail(authentication.getName());
         model.addAttribute("pets", animalService.findByGuardian(guardian.getId()));
+        model.addAttribute("clinics", clinicService.findApproved());
+        model.addAttribute("veterinarians", veterinarianService.findAll());
         return "exame";
     }
 
@@ -128,9 +165,33 @@ public class GuardianHomeController {
         }
         if (result.hasErrors()) {
             model.addAttribute("pets", animalService.findByGuardian(guardian.getId()));
+            model.addAttribute("clinics", clinicService.findApproved());
+            model.addAttribute("veterinarians", veterinarianService.findAll());
             return "exame";
         }
         checkUpService.create(checkUpDTO);
+        return "redirect:/guardian/home";
+    }
+
+    @GetMapping("/exame/{id}/cancelar")
+    public String exameCancelarForm(@PathVariable Integer id, Model model) {
+        model.addAttribute("cancelDTO", new CancelRequestDTO());
+        model.addAttribute("targetUrl", "/guardian/exame/" + id + "/cancelar");
+        model.addAttribute("title", "Cancelar exame");
+        return "cancelamento";
+    }
+
+    @PostMapping("/exame/{id}/cancelar")
+    public String exameCancelar(@PathVariable Integer id,
+                                 @Valid @ModelAttribute("cancelDTO") CancelRequestDTO cancelDTO,
+                                 BindingResult result, Authentication authentication, Model model) {
+        if (result.hasErrors()) {
+            model.addAttribute("targetUrl", "/guardian/exame/" + id + "/cancelar");
+            model.addAttribute("title", "Cancelar exame");
+            return "cancelamento";
+        }
+        Guardian guardian = guardianService.findByEmail(authentication.getName());
+        checkUpService.cancelByGuardian(id, guardian.getId(), cancelDTO.getReason());
         return "redirect:/guardian/home";
     }
 

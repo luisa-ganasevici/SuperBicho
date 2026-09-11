@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>SuperBicho - Veterinários</title>
+</head>
+<body>
+<h1>Veterinários - <span th:text="${clinic.name}"></span></h1>
+
+<h2>Adicionar veterinário</h2>
+<form th:action="@{/clinica/veterinarios}" th:object="${veterinarianDTO}" method="post">
+    <label>Nome:
+        <input type="text" th:field="*{name}">
+    </label>
+    <p th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></p>
+    <br>
+
+    <label>Especialidade:
+        <input type="text" th:field="*{specialty}" placeholder="Ex: Clínica geral, Dermatologia, Ortopedia">
+    </label>
+    <p th:if="${#fields.hasErrors('specialty')}" th:errors="*{specialty}"></p>
+    <br>
+
+    <button type="submit">Adicionar</button>
+</form>
+
+<h2>Veterinários cadastrados</h2>
+<p th:if="${#lists.isEmpty(veterinarians)}">Nenhum veterinário cadastrado ainda.</p>
+<table th:unless="${#lists.isEmpty(veterinarians)}" border="1">
+    <tr>
+        <th>Nome</th>
+        <th>Especialidade</th>
+    </tr>
+    <tr th:each="vet : ${veterinarians}">
+        <td th:text="${vet.name}"></td>
+        <td th:text="${vet.specialty}"></td>
+    </tr>
+</table>
+
+<br><a th:href="@{/clinica/home}">Voltar para o painel</a>
+</body>
+</html>

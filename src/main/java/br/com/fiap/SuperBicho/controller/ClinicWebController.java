@@ -1,8 +1,12 @@
 package br.com.fiap.SuperBicho.controller;
 
+import br.com.fiap.SuperBicho.dto.request.CancelRequestDTO;
+import br.com.fiap.SuperBicho.dto.request.VeterinarianRequestDTO;
 import br.com.fiap.SuperBicho.entity.Clinic;
 import br.com.fiap.SuperBicho.service.AppointmentService;
+import br.com.fiap.SuperBicho.service.CheckUpService;
 import br.com.fiap.SuperBicho.service.ClinicService;
+import br.com.fiap.SuperBicho.service.VeterinarianService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.propertyeditors.StringTrimmerEditor;
@@ -20,6 +24,8 @@ public class ClinicWebController {
 
     private final ClinicService clinicService;
     private final AppointmentService appointmentService;
+    private final CheckUpService checkUpService;
+    private final VeterinarianService veterinarianService;
 
     @InitBinder
     public void initBinder(WebDataBinder binder) {
@@ -58,6 +64,73 @@ public class ClinicWebController {
         Clinic clinic = clinicService.findByEmail(authentication.getName());
         model.addAttribute("clinic", clinic);
         model.addAttribute("appointments", appointmentService.findByClinic(clinic.getId()));
+        model.addAttribute("checkUps", checkUpService.findByClinic(clinic.getId()));
         return "clinic-home";
     }
+
+    @PostMapping("/agendamento/{id}/concluir")
+    public String concluirAgendamento(@PathVariable Integer id, Authentication authentication) {
+        Clinic clinic = clinicService.findByEmail(authentication.getName());
+        appointmentService.completeByClinic(id, clinic.getId());
+        return "redirect:/clinica/home";
+    }
+
+    @PostMapping("/exame/{id}/concluir")
+    public String concluirExame(@PathVariable Integer id, Authentication authentication) {
+        Clinic clinic = clinicService.findByEmail(authentication.getName());
+        checkUpService.completeByClinic(id, clinic.getId());
+        return "redirect:/clinica/home";
+    }
+
+    @GetMapping("/agendamento/{id}/cancelar")
+    public String cancelarAgendamentoForm(@PathVariable Integer id, Model model) {
+        model.addAttribute("cancelDTO", new CancelRequestDTO());
+        model.addAttribute("targetUrl", "/clinica/agendamento/" + id + "/cancelar");
+        model.addAttribute("title", "Cancelar agendamento");
+        return "cancelamento";
+    }
+
+    @PostMapping("/agendamento/{id}/cancelar")
+    public String cancelarAgendamento(@PathVariable Integer id,
+                                      @Valid @ModelAttribute("cancelDTO") CancelRequestDTO cancelDTO,
+                                      BindingResult result, Authentication authentication, Model model) {
+        if (result.hasErrors()) {
+            model.addAttribute("targetUrl", "/clinica/agendamento/" + id + "/cancelar");
+            model.addAttribute("title", "Cancelar agendamento");
+            return "cancelamento";
+        }
+        Clinic clinic = clinicService.findByEmail(authentication.getName());
+        appointmentService.cancelByClinic(id, clinic.getId(), cancelDTO.getReason());
+        return "redirect:/clinica/home";
+    }
+
+    @ModelAttribute("veterinarianDTO")
+    public VeterinarianRequestDTO prepareVeterinarianDTO(Authentication authentication) {
+        Clinic clinic = clinicService.findByEmail(authentication.getName());
+        VeterinarianRequestDTO dto = new VeterinarianRequestDTO();
+        dto.setClinicId(clinic.getId());
+        return dto;
+    }
+
+    @GetMapping("/veterinarios")
+    public String veterinarios(Model model, Authentication authentication) {
+        Clinic clinic = clinicService.findByEmail(authentication.getName());
+        model.addAttribute("clinic", clinic);
+        model.addAttribute("veterinarians", veterinarianService.findByClinic(clinic.getId()));
+        return "clinic-veterinarios";
+    }
+
+    @PostMapping("/veterinarios")
+    public String veterinariosSubmit(@Valid @ModelAttribute("veterinarianDTO") VeterinarianRequestDTO veterinarianDTO,
+                                     BindingResult result, Authentication authentication, Model model) {
+        if (result.hasErrors()) {
+            Clinic clinic = clinicService.findByEmail(authentication.getName());
+            model.addAttribute("clinic", clinic);
+            model.addAttribute("veterinarians", veterinarianService.findByClinic(clinic.getId()));
+            return "clinic-veterinarios";
+        }
+        veterinarianService.create(veterinarianDTO);
+        return "redirect:/clinica/veterinarios";
+    }
+
 }

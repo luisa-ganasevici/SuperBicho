@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>SuperBicho - Cancelar</title>
+</head>
+<body>
+<h1 th:text="${title}">Cancelar</h1>
+
+<form th:action="@{${targetUrl}}" th:object="${cancelDTO}" method="post">
+    <label>Motivo do cancelamento:
+        <textarea th:field="*{reason}" required></textarea>
+    </label>
+    <p th:if="${#fields.hasErrors('reason')}" th:errors="*{reason}"></p>
+    <br>
+
+    <button type="submit">Confirmar cancelamento</button>
+</form>
+
+<br><a href="javascript:history.back()">Voltar</a>
+</body>
+</html>

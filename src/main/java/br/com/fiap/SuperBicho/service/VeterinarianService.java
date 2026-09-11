@@ -1,0 +1,54 @@
+package br.com.fiap.SuperBicho.service;
+
+import br.com.fiap.SuperBicho.dto.request.VeterinarianRequestDTO;
+import br.com.fiap.SuperBicho.dto.response.VeterinarianResponseDTO;
+import br.com.fiap.SuperBicho.entity.Clinic;
+import br.com.fiap.SuperBicho.entity.Veterinarian;
+import br.com.fiap.SuperBicho.repository.ClinicRepository;
+import br.com.fiap.SuperBicho.repository.VeterinarianRepository;
+import java.util.List;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
+
+@Service
+@RequiredArgsConstructor
+public class VeterinarianService {
+
+    private final VeterinarianRepository veterinarianRepository;
+    private final ClinicRepository clinicRepository;
+
+    public VeterinarianResponseDTO create(VeterinarianRequestDTO dto) {
+        Veterinarian veterinarian = new Veterinarian();
+        veterinarian.setName(dto.getName());
+        veterinarian.setSpecialty(dto.getSpecialty());
+        veterinarian.setClinic(resolveClinic(dto.getClinicId()));
+        return toResponse(veterinarianRepository.save(veterinarian));
+    }
+
+    public List<VeterinarianResponseDTO> findByClinic(Integer clinicId) {
+        return veterinarianRepository.findByClinicId(clinicId).stream()
+                .map(this::toResponse)
+                .toList();
+    }
+
+    public List<VeterinarianResponseDTO> findAll() {
+        return veterinarianRepository.findAll().stream()
+                .map(this::toResponse)
+                .toList();
+    }
+
+    private Clinic resolveClinic(Integer clinicId) {
+        return clinicRepository.findById(clinicId).orElseThrow(() -> notFound("Clinic"));
+    }
+
+    private VeterinarianResponseDTO toResponse(Veterinarian veterinarian) {
+        return new VeterinarianResponseDTO(veterinarian.getId(), veterinarian.getName(),
+                veterinarian.getSpecialty(), veterinarian.getClinic().getId());
+    }
+
+    private ResponseStatusException notFound(String resource) {
+        return new ResponseStatusException(HttpStatus.NOT_FOUND, resource + " not found");
+    }
+}

@@ -7,30 +7,64 @@
 <body>
 <h1>Painel - <span th:text="${clinic.name}">Clínica</span></h1>
 
-<p>Bem-vinda ao site de credenciados da SuperBicho!</p>
+<a th:href="@{/clinica/veterinarios}">Gerenciar veterinários</a>
 
 <h2>Agendamentos</h2>
 <p th:if="${#lists.isEmpty(appointments)}">Nenhum agendamento no momento.</p>
-<table th:if="${not #lists.isEmpty(appointments)}">
-    <thead>
+<table th:unless="${#lists.isEmpty(appointments)}" border="1">
     <tr>
         <th>Pet</th>
+        <th>Veterinário</th>
         <th>Data</th>
         <th>Horário</th>
         <th>Status</th>
+        <th>Motivo do cancelamento</th>
+        <th>Ações</th>
     </tr>
-    </thead>
-    <tbody>
     <tr th:each="appointment : ${appointments}">
         <td th:text="${appointment.animalName}"></td>
+        <td th:text="${appointment.veterinarianName}"></td>
         <td th:text="${appointment.date}"></td>
         <td th:text="${appointment.time}"></td>
         <td th:text="${appointment.status}"></td>
+        <td th:text="${appointment.cancelReason}"></td>
+        <td th:if="${appointment.status == 'AGENDADO'}">
+            <form th:action="@{'/clinica/agendamento/' + ${appointment.id} + '/concluir'}" method="post" style="display:inline">
+                <button type="submit">Concluir</button>
+            </form>
+            <a th:href="@{'/clinica/agendamento/' + ${appointment.id} + '/cancelar'}">Cancelar</a>
+        </td>
     </tr>
-    </tbody>
 </table>
 
+<h2>Exames</h2>
+<p th:if="${#lists.isEmpty(checkUps)}">Nenhum exame no momento.</p>
+<table th:unless="${#lists.isEmpty(checkUps)}" border="1">
+    <tr>
+        <th>Pet</th>
+        <th>Tipo</th>
+        <th>Veterinário</th>
+        <th>Data</th>
+        <th>Status</th>
+        <th>Motivo do cancelamento</th>
+        <th>Ações</th>
+    </tr>
+    <tr th:each="checkUp : ${checkUps}">
+        <td th:text="${checkUp.animalName}"></td>
+        <td th:text="${checkUp.checkUpType}"></td>
+        <td th:text="${checkUp.veterinarianName}"></td>
+        <td th:text="${checkUp.checkUpDate}"></td>
+        <td th:text="${checkUp.status}"></td>
+        <td th:text="${checkUp.cancelReason}"></td>
+        <td th:if="${checkUp.status == 'PENDENTE'}">
+            <form th:action="@{'/clinica/exame/' + ${checkUp.id} + '/concluir'}" method="post" style="display:inline">
+                <button type="submit">Concluir</button>
+            </form>
+        </td>
+    </tr>
+</table>
 
+<br><a th:href="@{/}">Voltar para a Home</a>
 <form th:action="@{/clinica/logout}" method="post">
     <button type="submit">logout</button>
 </form>

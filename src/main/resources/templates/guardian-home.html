@@ -15,12 +15,14 @@
         <th>Espécie</th>
         <th>Idade</th>
         <th>Peso</th>
+        <th>Histórico</th>
     </tr>
     <tr th:each="animal : ${animals}">
         <td th:text="${animal.name}"></td>
         <td th:text="${animal.species}"></td>
         <td th:text="${animal.age}"></td>
         <td th:text="${animal.weight}"></td>
+        <td><a th:href="@{'/guardian/pet/' + ${animal.id} + '/historico'}">Ver histórico</a></td>
     </tr>
 </table>
 
@@ -30,16 +32,25 @@
     <tr>
         <th>Pet</th>
         <th>Clínica</th>
+        <th>Veterinário</th>
         <th>Data</th>
         <th>Horário</th>
         <th>Status</th>
+        <th>Motivo do cancelamento</th>
+        <th>Ações</th>
     </tr>
     <tr th:each="appointment : ${appointments}">
         <td th:text="${appointment.animalName}"></td>
         <td th:text="${appointment.clinicName}"></td>
+        <td th:text="${appointment.veterinarianName}"></td>
         <td th:text="${appointment.date}"></td>
         <td th:text="${appointment.time}"></td>
         <td th:text="${appointment.status}"></td>
+        <td th:text="${appointment.cancelReason}"></td>
+        <td>
+            <a th:if="${appointment.status == 'AGENDADO'}"
+               th:href="@{'/guardian/agendamento/' + ${appointment.id} + '/cancelar'}">Cancelar</a>
+        </td>
     </tr>
 </table>
 
@@ -49,16 +60,25 @@
     <tr>
         <th>Pet</th>
         <th>Tipo</th>
+        <th>Clínica</th>
+        <th>Veterinário</th>
         <th>Data</th>
         <th>Status</th>
-        <th>Observações</th>
+        <th>Motivo do cancelamento</th>
+        <th>Ações</th>
     </tr>
     <tr th:each="checkUp : ${checkUps}">
         <td th:text="${checkUp.animalName}"></td>
         <td th:text="${checkUp.checkUpType}"></td>
+        <td th:text="${checkUp.clinicName}"></td>
+        <td th:text="${checkUp.veterinarianName}"></td>
         <td th:text="${checkUp.checkUpDate}"></td>
         <td th:text="${checkUp.status}"></td>
-        <td th:text="${checkUp.notes}"></td>
+        <td th:text="${checkUp.cancelReason}"></td>
+        <td>
+            <a th:if="${checkUp.status == 'PENDENTE'}"
+               th:href="@{'/guardian/exame/' + ${checkUp.id} + '/cancelar'}">Cancelar</a>
+        </td>
     </tr>
 </table>
 

@@ -11,8 +11,11 @@ public class AppointmentResponseDTO {
     private String date;
     private String time;
     private String status;
+    private String cancelReason;
     private Integer animalId;
     private String animalName;
     private Integer clinicId;
     private String clinicName;
+    private Integer veterinarianId;
+    private String veterinarianName;
 }
