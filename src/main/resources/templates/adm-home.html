@@ -57,38 +57,6 @@
     </tr>
 </table>
 
-<!DOCTYPE html>
-<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
-<head>
-    <meta charset="UTF-8">
-    <title>SuperBicho - Status da Clínica</title>
-</head>
-<body>
-<h1>Olá, <span th:text="${clinic.name}">Clínica</span></h1>
-
-<p th:if="${notice}" style="color:red; font-weight:bold" th:text="${notice}"></p>
-
-<div th:if="${clinic.clinicStatus.name() == 'PENDING'}">
-    <p>Sua clínica está sendo analisada para aprovação de credenciados. Por favor, aguarde.</p>
-</div>
-
-<div th:if="${clinic.clinicStatus.name() == 'APPROVED'}">
-    <p>Sua clínica foi aprovada! Bem-vinda ao SuperBicho.</p>
-    <a th:href="@{/clinica/home}">Acessar painel</a>
-</div>
-
-<div th:if="${clinic.clinicStatus.name() == 'DENIED'}">
-    <p>Seu cadastro não foi aprovado. Entre em contato com o suporte para mais informações.</p>
-</div>
-
-<div th:if="${clinic.clinicStatus.name() == 'REMOVED'}">
-    <p>Sua clínica foi desativada do cadastro da SuperBicho. Caso tenha dúvidas, entre em contato conosco.</p>
-</div>
-<form th:action="@{/clinica/logout}" method="post">
-    <button type="submit">logout</button>
-</form>
-</body>
-</html>
 <form th:action="@{/adm/logout}" method="post">
     <button type="submit">logout</button>
 </form>

@@ -11,6 +11,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 
 @Configuration
 @EnableWebSecurity
@@ -35,7 +36,11 @@ public class SecurityConfig {
     @Bean
     @Order(1)
     public SecurityFilterChain adminFilterChain(HttpSecurity http) throws Exception {
+        HttpSessionSecurityContextRepository admRepo = new HttpSessionSecurityContextRepository();
+        admRepo.setSpringSecurityContextKey("SPRING_SECURITY_CONTEXT_ADM");
+
         http.securityMatcher("/adm/**")
+                .securityContext(context -> context.securityContextRepository(admRepo))
                 .authenticationProvider(providerFor(adminUserDetailsService))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/adm/login").permitAll()
@@ -55,7 +60,11 @@ public class SecurityConfig {
     @Bean
     @Order(2)
     public SecurityFilterChain clinicFilterChain(HttpSecurity http) throws Exception {
+        HttpSessionSecurityContextRepository clinicaRepo = new HttpSessionSecurityContextRepository();
+        clinicaRepo.setSpringSecurityContextKey("SPRING_SECURITY_CONTEXT_CLINICA");
+
         http.securityMatcher("/clinica/**")
+                .securityContext(context -> context.securityContextRepository(clinicaRepo))
                 .authenticationProvider(providerFor(clinicUserDetailsService))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/clinica/login", "/clinica/cadastro").permitAll()
@@ -63,6 +72,9 @@ public class SecurityConfig {
                                 "CLINICA_APPROVED", "CLINICA_DENIED", "CLINICA_REMOVED")
                         .requestMatchers("/clinica/home").hasRole("CLINICA_APPROVED")
                         .anyRequest().hasRole("CLINICA_APPROVED"))
+                .exceptionHandling(exceptions -> exceptions
+                        .accessDeniedHandler((request, response, accessDeniedException) ->
+                                response.sendRedirect(request.getContextPath() + "/clinica/status")))
                 .formLogin(form -> form
                         .loginPage("/clinica/login")
                         .loginProcessingUrl("/clinica/login")
@@ -78,7 +90,11 @@ public class SecurityConfig {
     @Bean
     @Order(3)
     public SecurityFilterChain tutorFilterChain(HttpSecurity http) throws Exception {
+        HttpSessionSecurityContextRepository tutorRepo = new HttpSessionSecurityContextRepository();
+        tutorRepo.setSpringSecurityContextKey("SPRING_SECURITY_CONTEXT_TUTOR");
+
         http.securityMatcher("/**")
+                .securityContext(context -> context.securityContextRepository(tutorRepo))
                 .authenticationProvider(providerFor(guardianUserDetailsService))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/", "/login", "/cadastro", "/css/**", "/js/**", "/images/**").permitAll()
