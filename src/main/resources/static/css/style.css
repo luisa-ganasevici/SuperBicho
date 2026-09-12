@@ -386,3 +386,12 @@ a { color: var(--sb-blue); }
   cursor: pointer;
 }
 .sb-logout-btn:hover { background: #fadcdc; }
+
+
+.sb-header__link {
+  color: #fff;
+  font-size: 13.5px;
+  text-decoration: underline;
+  margin-right: 14px;
+}
+.sb-header__link:hover { opacity: 0.85; }

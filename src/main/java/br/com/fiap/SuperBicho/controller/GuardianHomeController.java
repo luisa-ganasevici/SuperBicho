@@ -26,6 +26,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.http.HttpStatus;
+import br.com.fiap.SuperBicho.dto.request.GuardianRequestDTO;
 
 @Controller
 @RequestMapping("/guardian")
@@ -40,6 +41,7 @@ public class GuardianHomeController {
     private final VeterinarianService veterinarianService;
     private final VaccinationService vaccinationService;
     private final SeasonAlertService seasonAlertService;
+
 
     @ModelAttribute("animalDTO")
     public AnimalRequestDTO prepareAnimalDTO(Authentication authentication) {
@@ -59,6 +61,27 @@ public class GuardianHomeController {
         model.addAttribute("vaccineAlerts", vaccinationService.buildAlertsForGuardian(animals));
         model.addAttribute("seasonAlert", seasonAlertService.buildSeasonAlert());
         return "guardian-home";
+    }
+
+    @GetMapping("/perfil")
+    public String perfilForm(Model model, Authentication authentication) {
+        Guardian guardian = guardianService.findByEmail(authentication.getName());
+        GuardianRequestDTO dto = new GuardianRequestDTO();
+        dto.setName(guardian.getName());
+        dto.setEmail(guardian.getEmail());
+        model.addAttribute("guardianDTO", dto);
+        return "editar-perfil";
+    }
+
+    @PostMapping("/perfil")
+    public String perfilSubmit(@Valid @ModelAttribute("guardianDTO") GuardianRequestDTO dto,
+                               BindingResult result, Authentication authentication, Model model) {
+        if (result.hasErrors()) {
+            return "editar-perfil";
+        }
+        Guardian guardian = guardianService.findByEmail(authentication.getName());
+        guardianService.update(guardian.getId(), dto);
+        return "redirect:/guardian/home";
     }
 
     @GetMapping("/pet")

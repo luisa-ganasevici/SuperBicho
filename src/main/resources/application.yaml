@@ -1,5 +1,5 @@
 server:
-  port: ${PORT:8082}
+  port: ${PORT:8080}
 
 spring:
   application:
@@ -7,8 +7,8 @@ spring:
 
   datasource:
     url: jdbc:oracle:thin:@oracle.fiap.com.br:1521:orcl
-    username: ${DB_USER}
-    password: ${DB_PASSWORD}
+    username: rm563403
+    password: 230107
     driver-class-name: oracle.jdbc.OracleDriver
 
   jpa:

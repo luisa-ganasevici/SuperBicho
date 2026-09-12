@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>SuperBicho - Editar Perfil</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+<div class="sb-header">
+    <div class="sb-header__logo">🐶</div>
+    <p class="sb-header__title"><a th:href="@{/guardian/home}">SuperBicho</a></p>
+</div>
+<div class="sb-top-actions">
+    <form th:action="@{/logout}" method="post" style="margin:0;">
+        <button type="submit" class="sb-logout-btn">Sair</button>
+    </form>
+</div>
+
+<div class="sb-form-card">
+    <h1>Editar meus dados</h1>
+    <form th:action="@{/guardian/perfil}" th:object="${guardianDTO}" method="post">
+        <label class="sb-field">
+            <span>Nome</span>
+            <input type="text" th:field="*{name}">
+        </label>
+        <p th:if="${#fields.hasErrors('name')}" th:errors="*{name}" class="sb-error"></p>
+
+        <label class="sb-field">
+            <span>Email</span>
+            <input type="text" th:field="*{email}">
+        </label>
+        <p th:if="${#fields.hasErrors('email')}" th:errors="*{email}" class="sb-error"></p>
+
+        <label class="sb-field">
+            <span>Confirme sua senha para salvar</span>
+            <input type="password" th:field="*{password}">
+        </label>
+        <p th:if="${#fields.hasErrors('password')}" th:errors="*{password}" class="sb-error"></p>
+
+        <button type="submit" class="sb-btn sb-btn--blue">Salvar alterações</button>
+    </form>
+    <a class="sb-back-link" th:href="@{/guardian/home}">Voltar</a>
+</div>
+</body>
+</html>
