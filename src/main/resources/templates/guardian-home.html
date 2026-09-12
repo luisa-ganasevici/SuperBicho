@@ -13,12 +13,11 @@
         <li th:each="alert : ${vaccineAlerts}">
             <span th:text="${alert.animalName}"></span> —
             <span th:text="${alert.vaccineName}"></span> —
-            <span th:text="${alert.calendarStatus == 'ATRASADA'} ? 'atrasada!' : 'vence em breve'"></span>
+            <span th:text="${alert.calendarStatus == 'ATRASADA'} ? 'atrasada!' : (${alert.calendarStatus == 'NUNCA_APLICADA'} ? 'nunca aplicada' : 'vence em breve')"></span>
             <span th:if="${alert.nextDueDate != null}">(previsão: <span th:text="${alert.nextDueDate}"></span>)</span>
         </li>
     </ul>
 </div>
-<td><a th:href="@{'/guardian/pet/' + ${animal.id} + '/vacinas'}">Vacinas</a></td>
 <div style="border:1px solid #999; padding:10px; margin-bottom:15px;">
     <h2>Lembretes</h2>
     <ul>
@@ -45,6 +44,7 @@
         <th>Idade</th>
         <th>Peso</th>
         <th>Histórico</th>
+        <th>Vacinas</th>
     </tr>
     <tr th:each="animal : ${animals}">
         <td th:text="${animal.name}"></td>
@@ -52,6 +52,7 @@
         <td th:text="${animal.age}"></td>
         <td th:text="${animal.weight}"></td>
         <td><a th:href="@{'/guardian/pet/' + ${animal.id} + '/historico'}">Ver histórico</a></td>
+        <td><a th:href="@{'/guardian/pet/' + ${animal.id} + '/vacinas'}">Vacinas</a></td>
     </tr>
 </table>
 

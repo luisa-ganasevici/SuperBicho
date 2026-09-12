@@ -105,25 +105,21 @@ public class GuardianHomeController {
         model.addAttribute("calendar", vaccinationService.buildCalendar(id));
         model.addAttribute("applications", vaccinationService.findByAnimal(id));
         model.addAttribute("vaccines", vaccinationService.findAllVaccines());
-        return "vacinas-animal";
+        return "vacinas";
     }
 
-    @PostMapping("/pet/{id}/vacinas")
-    public String registerVaccination(@PathVariable Integer id,
-                                      @Valid @ModelAttribute("vaccinationDTO") AnimalVaccinationRequestDTO dto,
-                                      BindingResult result, Authentication authentication, Model model) {
+    @PostMapping("/pet/{id}/vacinas/{vaccineId}/aplicar")
+    public String marcarVacinaAplicada(@PathVariable Integer id, @PathVariable Integer vaccineId,
+                                       Authentication authentication) {
         Guardian guardian = guardianService.findByEmail(authentication.getName());
         Animal animal = animalService.findEntityById(id);
         if (!animal.getGuardian().getId().equals(guardian.getId())) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "This pet does not belong to you");
         }
-        if (result.hasErrors()) {
-            model.addAttribute("animal", animal);
-            model.addAttribute("calendar", vaccinationService.buildCalendar(id));
-            model.addAttribute("applications", vaccinationService.findByAnimal(id));
-            model.addAttribute("vaccines", vaccinationService.findAllVaccines());
-            return "vacinas-animal";
-        }
+        AnimalVaccinationRequestDTO dto = new AnimalVaccinationRequestDTO();
+        dto.setAnimalId(id);
+        dto.setVaccineId(vaccineId);
+        dto.setApplicationDate(java.time.LocalDate.now().toString());
         vaccinationService.registerApplication(dto);
         return "redirect:/guardian/pet/" + id + "/vacinas";
     }
@@ -244,4 +240,15 @@ public class GuardianHomeController {
         return "redirect:/guardian/home";
     }
 
+    @PostMapping("/pet/{id}/vacinas/{vaccineId}/desmarcar")
+    public String desmarcarVacinaAplicada(@PathVariable Integer id, @PathVariable Integer vaccineId,
+                                          Authentication authentication) {
+        Guardian guardian = guardianService.findByEmail(authentication.getName());
+        Animal animal = animalService.findEntityById(id);
+        if (!animal.getGuardian().getId().equals(guardian.getId())) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "This pet does not belong to you");
+        }
+        vaccinationService.desfazerAplicacaoHoje(id, vaccineId);
+        return "redirect:/guardian/pet/" + id + "/vacinas";
+    }
 }

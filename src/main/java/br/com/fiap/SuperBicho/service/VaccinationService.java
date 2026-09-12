@@ -51,6 +51,7 @@ public class VaccinationService {
     public List<VaccineCalendarItemDTO> buildCalendar(Integer animalId) {
         List<Vaccine> vaccines = vaccineRepository.findAllByOrderByNameAsc();
         List<AnimalVaccination> applications = animalVaccinationRepository.findByAnimalId(animalId);
+        String todayStr = LocalDate.now().format(ISO);
 
         return vaccines.stream().map(vaccine -> {
             Optional<AnimalVaccination> lastApplication = applications.stream()
@@ -59,14 +60,15 @@ public class VaccinationService {
 
             if (lastApplication.isEmpty()) {
                 return new VaccineCalendarItemDTO(vaccine.getId(), vaccine.getName(), vaccine.getDescription(),
-                        null, null, "NUNCA_APLICADA");
+                        null, null, "NUNCA_APLICADA", false);
             }
 
             String lastDateStr = lastApplication.get().getApplicationDate();
+            boolean appliedToday = todayStr.equals(lastDateStr);
 
             if (vaccine.getBoosterIntervalMonths() == null) {
                 return new VaccineCalendarItemDTO(vaccine.getId(), vaccine.getName(), vaccine.getDescription(),
-                        lastDateStr, null, "DOSE_UNICA_CONCLUIDA");
+                        lastDateStr, null, "DOSE_UNICA_CONCLUIDA", appliedToday);
             }
 
             LocalDate nextDue = parseDate(lastDateStr).plusMonths(vaccine.getBoosterIntervalMonths());
@@ -81,15 +83,24 @@ public class VaccinationService {
             }
 
             return new VaccineCalendarItemDTO(vaccine.getId(), vaccine.getName(), vaccine.getDescription(),
-                    lastDateStr, nextDue.format(ISO), status);
+                    lastDateStr, nextDue.format(ISO), status, appliedToday);
         }).toList();
+    }
+
+    public void desfazerAplicacaoHoje(Integer animalId, Integer vaccineId) {
+        String todayStr = LocalDate.now().format(ISO);
+        animalVaccinationRepository.findByAnimalId(animalId).stream()
+                .filter(a -> a.getVaccine().getId().equals(vaccineId) && todayStr.equals(a.getApplicationDate()))
+                .max(Comparator.comparing(AnimalVaccination::getId))
+                .ifPresent(a -> animalVaccinationRepository.deleteById(a.getId()));
     }
 
     public List<VaccineAlertDTO> buildAlertsForGuardian(List<AnimalResponseDTO> animals) {
         return animals.stream()
                 .flatMap(animal -> buildCalendar(animal.getId()).stream()
                         .filter(item -> "ATRASADA".equals(item.getCalendarStatus())
-                                || "PROXIMA".equals(item.getCalendarStatus()))
+                                || "PROXIMA".equals(item.getCalendarStatus())
+                                || "NUNCA_APLICADA".equals(item.getCalendarStatus()))
                         .map(item -> new VaccineAlertDTO(animal.getId(), animal.getName(), item.getVaccineName(),
                                 item.getNextDueDate(), item.getCalendarStatus())))
                 .toList();
