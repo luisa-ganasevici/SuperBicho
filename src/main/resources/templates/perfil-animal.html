@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>SuperBicho - Perfil do Pet</title>
+  <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+<div class="sb-header">
+  <div class="sb-header__logo">🐶</div>
+  <p class="sb-header__title"><a th:href="@{/guardian/home}">SuperBicho</a></p>
+</div>
+<div class="sb-top-actions">
+  <form th:action="@{/logout}" method="post" style="margin:0;">
+    <button type="submit" class="sb-logout-btn">Sair</button>
+  </form>
+</div>
+
+<div class="sb-page">
+  <h1 style="color:var(--sb-teal-dark);" th:text="${animal.name}"></h1>
+
+  <div class="sb-card" style="flex-direction:column; align-items:flex-start; gap:6px;">
+    <div><strong>Espécie:</strong> <span th:text="${animal.species}"></span></div>
+    <div><strong>Idade:</strong> <span th:text="${animal.age}"></span> anos</div>
+    <div><strong>Peso:</strong> <span th:text="${animal.weight}"></span> kg</div>
+  </div>
+
+  <div class="sb-card__actions" style="margin-top:16px;">
+    <a class="sb-btn sb-btn--outline" th:href="@{'/guardian/pet/' + ${animal.id} + '/historico'}">Histórico</a>
+    <a class="sb-btn sb-btn--blue" th:href="@{'/guardian/pet/' + ${animal.id} + '/vacinas'}">Vacinas</a>
+    <a class="sb-btn sb-btn--outline" th:href="@{'/guardian/pet/' + ${animal.id} + '/editar'}">Editar</a>
+  </div>
+
+  <a class="sb-back-link" th:href="@{/guardian/home}">Voltar</a>
+</div>
+</body>
+</html>

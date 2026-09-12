@@ -98,6 +98,41 @@ public class GuardianHomeController {
         return "redirect:/guardian/home";
     }
 
+    @GetMapping("/pet/{id}/editar")
+    public String petEditForm(@PathVariable Integer id, Model model, Authentication authentication) {
+        Guardian guardian = guardianService.findByEmail(authentication.getName());
+        Animal animal = animalService.findEntityById(id);
+        if (!animal.getGuardian().getId().equals(guardian.getId())) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "This pet does not belong to you");
+        }
+        AnimalRequestDTO dto = new AnimalRequestDTO();
+        dto.setName(animal.getName());
+        dto.setSpecies(animal.getSpecies());
+        dto.setAge(animal.getAge());
+        dto.setWeight(animal.getWeight());
+        dto.setGuardianId(guardian.getId());
+        model.addAttribute("animalDTO", dto);
+        model.addAttribute("animalId", id);
+        return "editar-pet";
+    }
+
+    @PostMapping("/pet/{id}/editar")
+    public String petEditSubmit(@PathVariable Integer id,
+                                @Valid @ModelAttribute("animalDTO") AnimalRequestDTO dto,
+                                BindingResult result, Authentication authentication, Model model) {
+        Guardian guardian = guardianService.findByEmail(authentication.getName());
+        Animal animal = animalService.findEntityById(id);
+        if (!animal.getGuardian().getId().equals(guardian.getId())) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "This pet does not belong to you");
+        }
+        if (result.hasErrors()) {
+            model.addAttribute("animalId", id);
+            return "editar-pet";
+        }
+        animalService.update(id, dto);
+        return "redirect:/guardian/home";
+    }
+
     @GetMapping("/pet/{id}/historico")
     public String petHistory(@PathVariable Integer id, Model model, Authentication authentication) {
         Guardian guardian = guardianService.findByEmail(authentication.getName());
@@ -109,6 +144,17 @@ public class GuardianHomeController {
         model.addAttribute("appointments", appointmentService.findByAnimal(id));
         model.addAttribute("checkUps", checkUpService.findByAnimal(id));
         return "historico-animal";
+    }
+
+    @GetMapping("/pet/{id}")
+    public String petProfile(@PathVariable Integer id, Model model, Authentication authentication) {
+        Guardian guardian = guardianService.findByEmail(authentication.getName());
+        Animal animal = animalService.findEntityById(id);
+        if (!animal.getGuardian().getId().equals(guardian.getId())) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "This pet does not belong to you");
+        }
+        model.addAttribute("animal", animal);
+        return "perfil-animal";
     }
 
     @ModelAttribute("vaccinationDTO")

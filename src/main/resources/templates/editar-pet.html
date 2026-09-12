@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>SuperBicho - Editar Pet</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+<div class="sb-header">
+    <div class="sb-header__logo">🐶</div>
+    <p class="sb-header__title"><a th:href="@{/guardian/home}">SuperBicho</a></p>
+</div>
+<div class="sb-top-actions">
+    <form th:action="@{/logout}" method="post" style="margin:0;">
+        <button type="submit" class="sb-logout-btn">Sair</button>
+    </form>
+</div>
+
+<div class="sb-form-card">
+    <h1>Editar Pet</h1>
+    <form th:action="@{'/guardian/pet/' + ${animalId} + '/editar'}" th:object="${animalDTO}" method="post">
+        <label class="sb-field">
+            <span>Nome</span>
+            <input type="text" th:field="*{name}">
+        </label>
+        <p th:if="${#fields.hasErrors('name')}" th:errors="*{name}" class="sb-error"></p>
+
+        <label class="sb-field">
+            <span>Espécie</span>
+            <input type="text" th:field="*{species}">
+        </label>
+        <p th:if="${#fields.hasErrors('species')}" th:errors="*{species}" class="sb-error"></p>
+
+        <label class="sb-field">
+            <span>Idade</span>
+            <input type="number" th:field="*{age}">
+        </label>
+        <p th:if="${#fields.hasErrors('age')}" th:errors="*{age}" class="sb-error"></p>
+
+        <label class="sb-field">
+            <span>Peso (kg)</span>
+            <input type="number" step="0.01" th:field="*{weight}">
+        </label>
+        <p th:if="${#fields.hasErrors('weight')}" th:errors="*{weight}" class="sb-error"></p>
+
+        <button type="submit" class="sb-btn sb-btn--blue">Salvar alterações</button>
+    </form>
+    <a class="sb-back-link" th:href="@{/guardian/home}">Voltar</a>
+</div>
+</body>
+</html>

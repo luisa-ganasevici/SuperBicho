@@ -67,12 +67,10 @@
                         <span th:text="${animal.age}"></span> anos ·
                         <span th:text="${animal.weight}"></span> kg
                     </div>
-                </div>
-                <div class="sb-card__actions">
-                    <a class="sb-btn sb-btn--outline sb-btn--sm" th:href="@{'/guardian/pet/' + ${animal.id} + '/historico'}">Histórico</a>
-                    <a class="sb-btn sb-btn--blue sb-btn--sm" th:href="@{'/guardian/pet/' + ${animal.id} + '/vacinas'}">Vacinas</a>
-                    <button type="button" class="sb-btn sb-btn--danger sb-btn--sm" th:attr="onclick=|excluirAnimal(${animal.id})|">Excluir</button>
-                </div>
+                    <div class="sb-card__actions">
+                        <a class="sb-btn sb-btn--outline sb-btn--sm" th:href="@{'/guardian/pet/' + ${animal.id}}">Perfil</a>
+                        <button type="button" class="sb-btn sb-btn--danger sb-btn--sm" th:attr="onclick=|excluirAnimal(${animal.id})|">Excluir</button>
+                    </div>'
             </div>
         </div>
 
