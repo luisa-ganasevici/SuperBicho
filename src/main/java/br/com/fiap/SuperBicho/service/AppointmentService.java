@@ -2,6 +2,7 @@ package br.com.fiap.SuperBicho.service;
 
 import br.com.fiap.SuperBicho.dto.request.AppointmentRequestDTO;
 import br.com.fiap.SuperBicho.dto.response.AppointmentResponseDTO;
+import br.com.fiap.SuperBicho.dto.response.CheckUpResponseDTO;
 import br.com.fiap.SuperBicho.entity.*;
 import br.com.fiap.SuperBicho.repository.*;
 import lombok.RequiredArgsConstructor;
@@ -96,7 +97,23 @@ public class AppointmentService {
                 appointment.getAnimal().getId(), appointment.getAnimal().getName(),
                 appointment.getClinic().getId(), appointment.getClinic().getName(),
                 appointment.getVeterinarian() != null ? appointment.getVeterinarian().getId() : null,
-                appointment.getVeterinarian() != null ? appointment.getVeterinarian().getName() : null);
+                appointment.getVeterinarian() != null ? appointment.getVeterinarian().getName() : null,
+                appointment.getAnimal().getGuardian().getName());
+    }
+
+    private CheckUpResponseDTO toResponse(CheckUp checkUp) {
+        return new CheckUpResponseDTO(
+                checkUp.getId(),
+                checkUp.getCheckUpType(),
+                checkUp.getCheckUpDate(),
+                checkUp.getStatus(),
+                checkUp.getCancelReason(),
+                checkUp.getAnimal().getId(),
+                checkUp.getAnimal().getName(),
+                checkUp.getClinic() != null ? checkUp.getClinic().getId() : null,
+                checkUp.getClinic() != null ? checkUp.getClinic().getName() : null,
+                checkUp.getAnimal().getGuardian().getName()
+        );
     }
 
     private ResponseStatusException notFound(String resource) {

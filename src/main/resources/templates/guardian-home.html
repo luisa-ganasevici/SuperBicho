@@ -7,6 +7,35 @@
 <body>
 <h1>Meus pets</h1>
 
+<div th:if="${!#lists.isEmpty(vaccineAlerts)}" style="border:2px solid orange; padding:10px; margin-bottom:15px;">
+    <h2>⚠ Alerta preventivo: vacinação</h2>
+    <ul>
+        <li th:each="alert : ${vaccineAlerts}">
+            <span th:text="${alert.animalName}"></span> —
+            <span th:text="${alert.vaccineName}"></span> —
+            <span th:text="${alert.calendarStatus == 'ATRASADA'} ? 'atrasada!' : 'vence em breve'"></span>
+            <span th:if="${alert.nextDueDate != null}">(previsão: <span th:text="${alert.nextDueDate}"></span>)</span>
+        </li>
+    </ul>
+</div>
+<td><a th:href="@{'/guardian/pet/' + ${animal.id} + '/vacinas'}">Vacinas</a></td>
+<div style="border:1px solid #999; padding:10px; margin-bottom:15px;">
+    <h2>Lembretes</h2>
+    <ul>
+        <li th:each="appointment : ${appointments}" th:if="${appointment.status == 'AGENDADO'}">
+            Consulta de <span th:text="${appointment.animalName}"></span> em
+            <span th:text="${appointment.clinicName}"></span> —
+            <span th:text="${appointment.date}"></span> às <span th:text="${appointment.time}"></span>
+        </li>
+        <li th:each="checkUp : ${checkUps}" th:if="${checkUp.status == 'PENDENTE'}">
+            Exame (<span th:text="${checkUp.checkUpType}"></span>) de
+            <span th:text="${checkUp.animalName}"></span> em
+            <span th:text="${checkUp.clinicName}"></span> —
+            <span th:text="${checkUp.checkUpDate}"></span>
+        </li>
+    </ul>
+</div>
+
 <p th:if="${#lists.isEmpty(animals)}">Você ainda não cadastrou nenhum pet.</p>
 
 <table th:unless="${#lists.isEmpty(animals)}" border="1">

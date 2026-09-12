@@ -7,6 +7,10 @@ import br.com.fiap.SuperBicho.service.AppointmentService;
 import br.com.fiap.SuperBicho.service.CheckUpService;
 import br.com.fiap.SuperBicho.service.ClinicService;
 import br.com.fiap.SuperBicho.service.VeterinarianService;
+import br.com.fiap.SuperBicho.dto.response.AppointmentResponseDTO;
+import br.com.fiap.SuperBicho.dto.response.CheckUpResponseDTO;
+import java.time.LocalDate;
+import java.util.List;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.propertyeditors.StringTrimmerEditor;
@@ -68,9 +72,19 @@ public class ClinicWebController {
     @GetMapping("/home")
     public String home(Model model, Authentication authentication) {
         Clinic clinic = clinicService.findByEmail(authentication.getName());
+        List<AppointmentResponseDTO> appointments = appointmentService.findByClinic(clinic.getId());
+        List<CheckUpResponseDTO> checkUps = checkUpService.findByClinic(clinic.getId());
         model.addAttribute("clinic", clinic);
-        model.addAttribute("appointments", appointmentService.findByClinic(clinic.getId()));
-        model.addAttribute("checkUps", checkUpService.findByClinic(clinic.getId()));
+        model.addAttribute("appointments", appointments);
+        model.addAttribute("checkUps", checkUps);
+
+        String today = LocalDate.now().toString(); // formato yyyy-MM-dd, igual ao <input type="date">
+        model.addAttribute("todayAppointments", appointments.stream()
+                .filter(a -> today.equals(a.getDate()) && AppointmentService.STATUS_SCHEDULED.equals(a.getStatus()))
+                .toList());
+        model.addAttribute("todayCheckUps", checkUps.stream()
+                .filter(c -> today.equals(c.getCheckUpDate()) && CheckUpService.STATUS_PENDING.equals(c.getStatus()))
+                .toList());
         return "clinic-home";
     }
 

@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>SuperBicho - Vacinação</title>
+</head>
+<body>
+<h1>Vacinação - <span th:text="${animal.name}"></span></h1>
+
+<h2>Calendário vacinal</h2>
+<table border="1">
+    <tr>
+        <th>Vacina</th>
+        <th>Descrição</th>
+        <th>Última aplicação</th>
+        <th>Próxima dose prevista</th>
+        <th>Situação</th>
+    </tr>
+    <tr th:each="item : ${calendar}">
+        <td th:text="${item.vaccineName}"></td>
+        <td th:text="${item.description}"></td>
+        <td th:text="${item.lastApplicationDate} ?: 'Nunca aplicada'"></td>
+        <td th:text="${item.nextDueDate} ?: '-'"></td>
+        <td th:switch="${item.calendarStatus}">
+            <span th:case="'NUNCA_APLICADA'">Nunca aplicada</span>
+            <span th:case="'ATRASADA'">⚠ Atrasada</span>
+            <span th:case="'PROXIMA'">Próxima do vencimento</span>
+            <span th:case="'EM_DIA'">Em dia</span>
+            <span th:case="'DOSE_UNICA_CONCLUIDA'">Concluída (dose única)</span>
+        </td>
+    </tr>
+</table>
+
+<h2>Marcar vacina como aplicada</h2>
+<form th:action="@{'/guardian/pet/' + ${animal.id} + '/vacinas'}" th:object="${vaccinationDTO}" method="post">
+    <label>Vacina:
+        <select th:field="*{vaccineId}">
+            <option th:each="vaccine : ${vaccines}" th:value="${vaccine.id}" th:text="${vaccine.name}"></option>
+        </select>
+    </label>
+    <p th:if="${#fields.hasErrors('vaccineId')}" th:errors="*{vaccineId}"></p>
+    <br>
+
+    <label>Data de aplicação:
+        <input type="date" th:field="*{applicationDate}">
+    </label>
+    <p th:if="${#fields.hasErrors('applicationDate')}" th:errors="*{applicationDate}"></p>
+    <br>
+
+    <button type="submit">Marcar como aplicada</button>
+</form>
+
+<h2>Histórico de aplicações</h2>
+<p th:if="${#lists.isEmpty(applications)}">Nenhuma vacina registrada ainda.</p>
+<table th:unless="${#lists.isEmpty(applications)}" border="1">
+    <tr>
+        <th>Vacina</th>
+        <th>Data de aplicação</th>
+    </tr>
+    <tr th:each="application : ${applications}">
+        <td th:text="${application.vaccineName}"></td>
+        <td th:text="${application.applicationDate}"></td>
+    </tr>
+</table>
+
+<br><a th:href="@{/guardian/home}">Voltar</a>
+</body>
+</html>

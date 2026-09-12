@@ -95,7 +95,8 @@ public class CheckUpService {
                 checkUp.getAnimal().getId(),
                 checkUp.getAnimal().getName(),
                 checkUp.getClinic() != null ? checkUp.getClinic().getId() : null,
-                checkUp.getClinic() != null ? checkUp.getClinic().getName() : null
+                checkUp.getClinic() != null ? checkUp.getClinic().getName() : null,
+                checkUp.getAnimal().getGuardian().getName()
         );
     }
 

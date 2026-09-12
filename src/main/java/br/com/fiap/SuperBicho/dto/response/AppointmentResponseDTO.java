@@ -18,4 +18,5 @@ public class AppointmentResponseDTO {
     private String clinicName;
     private Integer veterinarianId;
     private String veterinarianName;
+    private String guardianName;
 }

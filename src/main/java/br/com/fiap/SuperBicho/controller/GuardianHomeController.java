@@ -11,6 +11,10 @@ import br.com.fiap.SuperBicho.service.AppointmentService;
 import br.com.fiap.SuperBicho.service.CheckUpService;
 import br.com.fiap.SuperBicho.service.ClinicService;
 import br.com.fiap.SuperBicho.service.GuardianService;
+import br.com.fiap.SuperBicho.dto.request.AnimalVaccinationRequestDTO;
+import br.com.fiap.SuperBicho.dto.response.AnimalResponseDTO;
+import br.com.fiap.SuperBicho.service.VaccinationService;
+import java.util.List;
 import br.com.fiap.SuperBicho.service.VeterinarianService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -33,6 +37,7 @@ public class GuardianHomeController {
     private final ClinicService clinicService;
     private final CheckUpService checkUpService;
     private final VeterinarianService veterinarianService;
+    private final VaccinationService vaccinationService;
 
     @ModelAttribute("animalDTO")
     public AnimalRequestDTO prepareAnimalDTO(Authentication authentication) {
@@ -45,9 +50,11 @@ public class GuardianHomeController {
     @GetMapping("/home")
     public String home(Model model, Authentication authentication) {
         Guardian guardian = guardianService.findByEmail(authentication.getName());
-        model.addAttribute("animals", animalService.findByGuardian(guardian.getId()));
+        List<AnimalResponseDTO> animals = animalService.findByGuardian(guardian.getId());
+        model.addAttribute("animals", animals);
         model.addAttribute("appointments", appointmentService.findByGuardian(guardian.getId()));
         model.addAttribute("checkUps", checkUpService.findByGuardian(guardian.getId()));
+        model.addAttribute("vaccineAlerts", vaccinationService.buildAlertsForGuardian(animals));
         return "guardian-home";
     }
 
@@ -76,6 +83,49 @@ public class GuardianHomeController {
         model.addAttribute("appointments", appointmentService.findByAnimal(id));
         model.addAttribute("checkUps", checkUpService.findByAnimal(id));
         return "historico-animal";
+    }
+
+    @ModelAttribute("vaccinationDTO")
+    public AnimalVaccinationRequestDTO prepareVaccinationDTO(@PathVariable(required = false) Integer id) {
+        AnimalVaccinationRequestDTO dto = new AnimalVaccinationRequestDTO();
+        if (id != null) {
+            dto.setAnimalId(id);
+        }
+        return dto;
+    }
+
+    @GetMapping("/pet/{id}/vacinas")
+    public String vaccinationScreen(@PathVariable Integer id, Model model, Authentication authentication) {
+        Guardian guardian = guardianService.findByEmail(authentication.getName());
+        Animal animal = animalService.findEntityById(id);
+        if (!animal.getGuardian().getId().equals(guardian.getId())) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "This pet does not belong to you");
+        }
+        model.addAttribute("animal", animal);
+        model.addAttribute("calendar", vaccinationService.buildCalendar(id));
+        model.addAttribute("applications", vaccinationService.findByAnimal(id));
+        model.addAttribute("vaccines", vaccinationService.findAllVaccines());
+        return "vacinas-animal";
+    }
+
+    @PostMapping("/pet/{id}/vacinas")
+    public String registerVaccination(@PathVariable Integer id,
+                                      @Valid @ModelAttribute("vaccinationDTO") AnimalVaccinationRequestDTO dto,
+                                      BindingResult result, Authentication authentication, Model model) {
+        Guardian guardian = guardianService.findByEmail(authentication.getName());
+        Animal animal = animalService.findEntityById(id);
+        if (!animal.getGuardian().getId().equals(guardian.getId())) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "This pet does not belong to you");
+        }
+        if (result.hasErrors()) {
+            model.addAttribute("animal", animal);
+            model.addAttribute("calendar", vaccinationService.buildCalendar(id));
+            model.addAttribute("applications", vaccinationService.findByAnimal(id));
+            model.addAttribute("vaccines", vaccinationService.findAllVaccines());
+            return "vacinas-animal";
+        }
+        vaccinationService.registerApplication(dto);
+        return "redirect:/guardian/pet/" + id + "/vacinas";
     }
 
     @ModelAttribute("appointmentDTO")
