@@ -71,8 +71,8 @@ a { color: var(--sb-blue); }
   color: #fff;
   border: 1px solid rgba(255, 255, 255, 0.5);
   border-radius: 999px;
-  padding: 6px 14px;
-  font-size: 13px;
+  padding: 9px 20px;
+  font-size: 15px;
   cursor: pointer;
 }
 
@@ -231,7 +231,19 @@ a { color: var(--sb-blue); }
 }
 .sb-fab:hover { background: var(--sb-orange-dark); }
 
-
+.sb-fab-stack {
+  position: fixed;
+  right: 24px;
+  bottom: 24px;
+  z-index: 20;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 12px;
+}
+.sb-fab-stack .sb-fab {
+  position: static;
+}
 
 .sb-form-card {
   background: var(--sb-card);
@@ -344,3 +356,33 @@ a { color: var(--sb-blue); }
   .sb-card { flex-direction: column; align-items: stretch; }
   .sb-card__meta { text-align: left; }
 }
+
+.sb-checkbox-group label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+  font-size: 14px;
+}
+.sb-checkbox-group input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  flex: none;
+}
+
+.sb-top-actions {
+  display: flex;
+  justify-content: flex-end;
+  padding: 12px 20px 0;
+}
+.sb-logout-btn {
+  background: #fdeded;
+  color: var(--sb-red);
+  border: 1px solid #f3b9b9;
+  border-radius: 999px;
+  padding: 8px 18px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.sb-logout-btn:hover { background: #fadcdc; }

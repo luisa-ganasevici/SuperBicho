@@ -16,9 +16,9 @@
         <label class="sb-field"><span>Email</span><input type="text" name="username" required></label>
         <label class="sb-field"><span>Senha</span><input type="password" name="password" required></label>
         <p th:if="${param.error}" class="sb-error">Email ou senha incorretos.</p>
-        <button type="submit" class="sb-btn sb-btn--outline" style="border-color:var(--sb-teal); color:var(--sb-teal-dark);">Entrar</button>
+        <button type="submit" class="sb-btn sb-btn--blue">Entrar</button>
     </form>
-    <a class="sb-back-link" th:href="@{/}">Voltar para a Home</a>
+    <a class="sb-btn sb-btn--outline" th:href="@{/}">Voltar para a Home</a>
 </div>
 </body>
 </html>

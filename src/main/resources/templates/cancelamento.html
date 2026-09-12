@@ -11,6 +11,15 @@
     <p class="sb-header__title">SuperBicho</p>
 </div>
 
+<div class="sb-top-actions">
+    <form th:if="${#strings.startsWith(targetUrl,'/guardian')}" th:action="@{/logout}" method="post" style="margin:0;">
+        <button type="submit" class="sb-logout-btn">Sair</button>
+    </form>
+    <form th:if="${#strings.startsWith(targetUrl,'/clinica')}" th:action="@{/clinica/logout}" method="post" style="margin:0;">
+        <button type="submit" class="sb-logout-btn">Sair</button>
+    </form>
+</div>
+
 <div class="sb-form-card">
     <h1 th:text="${title}">Cancelar</h1>
 

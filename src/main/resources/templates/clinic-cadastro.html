@@ -31,7 +31,7 @@
         <label class="sb-field"><span>CNPJ (14 dígitos)</span><input type="text" th:field="*{cnpj}"></label>
         <p th:if="${#fields.hasErrors('cnpj')}" th:errors="*{cnpj}" class="sb-error"></p>
 
-        <div class="sb-field">
+        <div class="sb-field sb-checkbox-group">
             <span>Especialidades</span>
             <label><input type="checkbox" th:field="*{specialties}" value="Clínica Geral"> Clínica Geral</label><br>
             <label><input type="checkbox" th:field="*{specialties}" value="Cirurgia"> Cirurgia</label><br>
@@ -43,7 +43,7 @@
 
         <button type="submit" class="sb-btn sb-btn--blue">Cadastrar</button>
     </form>
-    <a class="sb-back-link" th:href="@{/}">Voltar para a Home</a>
+    <a class="sb-btn sb-btn--outline" th:href="@{/}">Voltar para a Home</a>
 </div>
 </body>
 </html>

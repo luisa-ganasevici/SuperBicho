@@ -11,6 +11,12 @@
     <p class="sb-header__title"><a th:href="@{/guardian/home}">SuperBicho</a></p>
 </div>
 
+<div class="sb-top-actions">
+  <form th:action="@{/logout}" method="post" style="margin:0;">
+    <button type="submit" class="sb-logout-btn">Sair</button>
+  </form>
+</div>
+
 <div class="sb-form-card">
   <h1>Registrar Exame</h1>
   <form th:action="@{/guardian/exame}" th:object="${checkUpDTO}" method="post">
