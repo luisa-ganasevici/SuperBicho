@@ -14,6 +14,7 @@ import br.com.fiap.SuperBicho.service.GuardianService;
 import br.com.fiap.SuperBicho.dto.request.AnimalVaccinationRequestDTO;
 import br.com.fiap.SuperBicho.dto.response.AnimalResponseDTO;
 import br.com.fiap.SuperBicho.service.VaccinationService;
+import br.com.fiap.SuperBicho.service.SeasonAlertService;
 import java.util.List;
 import br.com.fiap.SuperBicho.service.VeterinarianService;
 import jakarta.validation.Valid;
@@ -38,6 +39,7 @@ public class GuardianHomeController {
     private final CheckUpService checkUpService;
     private final VeterinarianService veterinarianService;
     private final VaccinationService vaccinationService;
+    private final SeasonAlertService seasonAlertService;
 
     @ModelAttribute("animalDTO")
     public AnimalRequestDTO prepareAnimalDTO(Authentication authentication) {
@@ -55,6 +57,7 @@ public class GuardianHomeController {
         model.addAttribute("appointments", appointmentService.findByGuardian(guardian.getId()));
         model.addAttribute("checkUps", checkUpService.findByGuardian(guardian.getId()));
         model.addAttribute("vaccineAlerts", vaccinationService.buildAlertsForGuardian(animals));
+        model.addAttribute("seasonAlert", seasonAlertService.buildSeasonAlert());
         return "guardian-home";
     }
 
@@ -162,8 +165,8 @@ public class GuardianHomeController {
 
     @PostMapping("/agendamento/{id}/cancelar")
     public String agendamentoCancelar(@PathVariable Integer id,
-                                       @Valid @ModelAttribute("cancelDTO") CancelRequestDTO cancelDTO,
-                                       BindingResult result, Authentication authentication, Model model) {
+                                      @Valid @ModelAttribute("cancelDTO") CancelRequestDTO cancelDTO,
+                                      BindingResult result, Authentication authentication, Model model) {
         if (result.hasErrors()) {
             model.addAttribute("targetUrl", "/guardian/agendamento/" + id + "/cancelar");
             model.addAttribute("title", "Cancelar agendamento");
@@ -228,8 +231,8 @@ public class GuardianHomeController {
 
     @PostMapping("/exame/{id}/cancelar")
     public String exameCancelar(@PathVariable Integer id,
-                                 @Valid @ModelAttribute("cancelDTO") CancelRequestDTO cancelDTO,
-                                 BindingResult result, Authentication authentication, Model model) {
+                                @Valid @ModelAttribute("cancelDTO") CancelRequestDTO cancelDTO,
+                                BindingResult result, Authentication authentication, Model model) {
         if (result.hasErrors()) {
             model.addAttribute("targetUrl", "/guardian/exame/" + id + "/cancelar");
             model.addAttribute("title", "Cancelar exame");

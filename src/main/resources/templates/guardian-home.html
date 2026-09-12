@@ -3,6 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <title>SuperBicho - Home</title>
+    <meta name="_csrf" th:content="${_csrf.token}"/>
+    <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
 </head>
 <body>
 <h1>Meus pets</h1>
@@ -18,6 +20,13 @@
         </li>
     </ul>
 </div>
+
+<div th:if="${seasonAlert != null}" style="border:2px solid steelblue; padding:10px; margin-bottom:15px;">
+    <h2>⚠ Alerta preventivo: clima (<span th:text="${seasonAlert.title}"></span>)</h2>
+    <p th:text="${seasonAlert.message}"></p>
+    <a th:href="${seasonAlert.linkUrl}" target="_blank" rel="noopener" th:text="${seasonAlert.linkLabel}"></a>
+</div>
+
 <div style="border:1px solid #999; padding:10px; margin-bottom:15px;">
     <h2>Lembretes</h2>
     <ul>
@@ -39,12 +48,7 @@
 
 <table th:unless="${#lists.isEmpty(animals)}" border="1">
     <tr>
-        <th>Nome</th>
-        <th>Espécie</th>
-        <th>Idade</th>
-        <th>Peso</th>
-        <th>Histórico</th>
-        <th>Vacinas</th>
+        <th>Nome</th><th>Espécie</th><th>Idade</th><th>Peso</th><th>Histórico</th><th>Vacinas</th><th>Excluir</th>
     </tr>
     <tr th:each="animal : ${animals}">
         <td th:text="${animal.name}"></td>
@@ -53,6 +57,9 @@
         <td th:text="${animal.weight}"></td>
         <td><a th:href="@{'/guardian/pet/' + ${animal.id} + '/historico'}">Ver histórico</a></td>
         <td><a th:href="@{'/guardian/pet/' + ${animal.id} + '/vacinas'}">Vacinas</a></td>
+        <td>
+            <button type="button" th:attr="onclick=|excluirAnimal(${animal.id})|">Excluir</button>
+        </td>
     </tr>
 </table>
 
@@ -78,8 +85,16 @@
         <td th:text="${appointment.status}"></td>
         <td th:text="${appointment.cancelReason}"></td>
         <td>
-            <a th:if="${appointment.status == 'AGENDADO'}"
-               th:href="@{'/guardian/agendamento/' + ${appointment.id} + '/cancelar'}">Cancelar</a>
+            <div th:if="${appointment.status == 'AGENDADO'}">
+                <input type="date" th:id="'date-' + ${appointment.id}" th:value="${appointment.date}">
+                <input type="time" th:id="'time-' + ${appointment.id}" th:value="${appointment.time}">
+                <button type="button"
+                        th:attr="onclick=|alterarDataAgendamento(${appointment.id}, ${appointment.animalId}, ${appointment.clinicId}, ${appointment.veterinarianId})|">
+                    Salvar
+                </button>
+                <br>
+                <a th:href="@{'/guardian/agendamento/' + ${appointment.id} + '/cancelar'}">Cancelar</a>
+            </div>
         </td>
     </tr>
 </table>
@@ -119,5 +134,41 @@
 <form th:action="@{/logout}" method="post">
     <button type="submit">logout</button>
 </form>
+<script>
+    function alterarDataAgendamento(id, animalId, clinicId, veterinarianId) {
+        const novaData = document.getElementById('date-' + id).value;
+        const novoHorario = document.getElementById('time-' + id).value;
+        if (!novaData || !novoHorario) { alert('Preencha data e horário.'); return; }
+
+        const csrfToken = document.querySelector('meta[name="_csrf"]').content;
+        const csrfHeader = document.querySelector('meta[name="_csrf_header"]').content;
+
+        fetch('/appointments/' + id, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json', [csrfHeader]: csrfToken },
+            body: JSON.stringify({
+                date: novaData, time: novoHorario, status: 'AGENDADO',
+                animalId: animalId, clinicId: clinicId, veterinarianId: veterinarianId
+            })
+        })
+        .then(res => { if (!res.ok) throw new Error('Erro ao atualizar (' + res.status + ')'); location.reload(); })
+        .catch(err => alert(err.message));
+    }
+
+    function excluirAnimal(id) {
+        if (!confirm('Excluir este pet? Essa ação não pode ser desfeita.')) return;
+
+        const csrfToken = document.querySelector('meta[name="_csrf"]').content;
+        const csrfHeader = document.querySelector('meta[name="_csrf_header"]').content;
+
+        fetch('/animals/' + id, {
+            method: 'DELETE',
+            headers: { [csrfHeader]: csrfToken }
+        })
+        .then(res => { if (!res.ok) throw new Error('Erro ao excluir (talvez tenha consulta/exame vinculado)'); location.reload(); })
+        .catch(err => alert(err.message));
+    }
+</script>
 </body>
 </html>
+</parameter>
