@@ -3,61 +3,73 @@
 <head>
     <meta charset="UTF-8">
     <title>SuperBicho - Vacinação</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
 </head>
 <body>
-<h1>Vacinação - <span th:text="${animal.name}"></span></h1>
+<div class="sb-header">
+    <div class="sb-header__logo">🐶</div>
+    <p class="sb-header__title"><a th:href="@{/guardian/home}">SuperBicho</a></p>
+</div>
 
-<h2>Calendário vacinal</h2>
-<table border="1">
-    <tr>
-        <th>Vacina</th>
-        <th>Descrição</th>
-        <th>Última aplicação</th>
-        <th>Próxima dose prevista</th>
-        <th>Situação</th>
-        <th>Aplicada hoje?</th>
-    </tr>
-    <tr th:each="item : ${calendar}">
-        <td th:text="${item.vaccineName}"></td>
-        <td th:text="${item.description}"></td>
-        <td th:text="${item.lastApplicationDate} ?: 'Nunca aplicada'"></td>
-        <td th:text="${item.nextDueDate} ?: '-'"></td>
-        <td th:switch="${item.calendarStatus}">
-            <span th:case="'NUNCA_APLICADA'">Nunca aplicada</span>
-            <span th:case="'ATRASADA'">⚠ Atrasada</span>
-            <span th:case="'PROXIMA'">Próxima do vencimento</span>
-            <span th:case="'EM_DIA'">Em dia</span>
-            <span th:case="'DOSE_UNICA_CONCLUIDA'">Concluída (dose única)</span>
-        </td>
-        <td>
-            <span th:if="${item.appliedToday}">✅ Realizada</span>
-            <form th:if="${item.appliedToday}"
-                  th:action="@{'/guardian/pet/' + ${animal.id} + '/vacinas/' + ${item.vaccineId} + '/desmarcar'}"
-                  method="post" style="display:inline; margin:0;">
-                <button type="submit">Desmarcar</button>
-            </form>
-            <form th:if="${!item.appliedToday and item.calendarStatus != 'DOSE_UNICA_CONCLUIDA'}"
-                  th:action="@{'/guardian/pet/' + ${animal.id} + '/vacinas/' + ${item.vaccineId} + '/aplicar'}"
-                  method="post" style="margin:0;">
-                <input type="checkbox" onchange="this.form.submit()" title="Marcar como aplicada hoje">
-            </form>
-        </td>
-    </tr>
-</table>
+<div class="sb-page">
+    <h1 style="color:var(--sb-teal-dark);">Vacinação - <span th:text="${animal.name}"></span></h1>
 
-<h2>Histórico de aplicações</h2>
-<p th:if="${#lists.isEmpty(applications)}">Nenhuma vacina registrada ainda.</p>
-<table th:unless="${#lists.isEmpty(applications)}" border="1">
-    <tr>
-        <th>Vacina</th>
-        <th>Data de aplicação</th>
-    </tr>
-    <tr th:each="aplicacao : ${applications}">
-        <td th:text="${aplicacao.vaccineName}"></td>
-        <td th:text="${aplicacao.applicationDate}"></td>
-    </tr>
-</table>
+    <h2 class="sb-section-title">Calendário vacinal</h2>
+    <div class="sb-table-card">
+        <table>
+            <tr>
+                <th>Vacina</th>
+                <th>Descrição</th>
+                <th>Última aplicação</th>
+                <th>Próxima dose prevista</th>
+                <th>Situação</th>
+                <th>Aplicada hoje?</th>
+            </tr>
+            <tr th:each="item : ${calendar}">
+                <td th:text="${item.vaccineName}"></td>
+                <td th:text="${item.description}"></td>
+                <td th:text="${item.lastApplicationDate} ?: 'Nunca aplicada'"></td>
+                <td th:text="${item.nextDueDate} ?: '-'"></td>
+                <td th:switch="${item.calendarStatus}">
+                    <span th:case="'NUNCA_APLICADA'">Nunca aplicada</span>
+                    <span th:case="'ATRASADA'">⚠ Atrasada</span>
+                    <span th:case="'PROXIMA'">Próxima do vencimento</span>
+                    <span th:case="'EM_DIA'">Em dia</span>
+                    <span th:case="'DOSE_UNICA_CONCLUIDA'">Concluída (dose única)</span>
+                </td>
+                <td>
+                    <span th:if="${item.appliedToday}">✅ Realizada</span>
+                    <form th:if="${item.appliedToday}"
+                          th:action="@{'/guardian/pet/' + ${animal.id} + '/vacinas/' + ${item.vaccineId} + '/desmarcar'}"
+                          method="post" style="display:inline; margin:0;">
+                        <button type="submit" class="sb-btn sb-btn--outline sb-btn--sm">Desmarcar</button>
+                    </form>
+                    <form th:if="${!item.appliedToday and item.calendarStatus != 'DOSE_UNICA_CONCLUIDA'}"
+                          th:action="@{'/guardian/pet/' + ${animal.id} + '/vacinas/' + ${item.vaccineId} + '/aplicar'}"
+                          method="post" style="margin:0;">
+                        <input type="checkbox" onchange="this.form.submit()" title="Marcar como aplicada hoje">
+                    </form>
+                </td>
+            </tr>
+        </table>
+    </div>
 
-<br><a th:href="@{/guardian/home}">Voltar</a>
+    <h2 class="sb-section-title">Histórico de aplicações</h2>
+    <p th:if="${#lists.isEmpty(applications)}" class="sb-empty">Nenhuma vacina registrada ainda.</p>
+    <div th:unless="${#lists.isEmpty(applications)}" class="sb-table-card">
+        <table>
+            <tr>
+                <th>Vacina</th>
+                <th>Data de aplicação</th>
+            </tr>
+            <tr th:each="aplicacao : ${applications}">
+                <td th:text="${aplicacao.vaccineName}"></td>
+                <td th:text="${aplicacao.applicationDate}"></td>
+            </tr>
+        </table>
+    </div>
+
+    <a class="sb-back-link" th:href="@{/guardian/home}">Voltar</a>
+</div>
 </body>
 </html>

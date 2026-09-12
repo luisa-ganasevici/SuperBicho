@@ -3,52 +3,59 @@
 <head>
   <meta charset="UTF-8">
   <title>SuperBicho - Agendar Consulta</title>
+  <link rel="stylesheet" th:href="@{/css/style.css}">
 </head>
 <body>
-<h1>Agendar Consulta</h1>
-<form th:action="@{/guardian/agendamento}" th:object="${appointmentDTO}" method="post">
-  <label>Pet:
-    <select th:field="*{animalId}">
-      <option th:each="pet : ${pets}" th:value="${pet.id}" th:text="${pet.name}"></option>
-    </select>
-  </label>
-  <p th:if="${#fields.hasErrors('animalId')}" th:errors="*{animalId}"></p>
-  <br>
+<div class="sb-header">
+    <div class="sb-header__logo">🐶</div>
+    <p class="sb-header__title"><a th:href="@{/guardian/home}">SuperBicho</a></p>
+</div>
 
-  <label>Clínica:
-    <select id="clinicSelect" th:field="*{clinicId}" onchange="filterVets()">
-      <option th:each="clinic : ${clinics}" th:value="${clinic.id}" th:text="${clinic.name}"></option>
-    </select>
-  </label>
-  <p th:if="${#fields.hasErrors('clinicId')}" th:errors="*{clinicId}"></p>
-  <br>
+<div class="sb-form-card">
+  <h1>Agendar Consulta</h1>
+  <form th:action="@{/guardian/agendamento}" th:object="${appointmentDTO}" method="post">
+    <label class="sb-field">
+      <span>Pet</span>
+      <select th:field="*{animalId}">
+        <option th:each="pet : ${pets}" th:value="${pet.id}" th:text="${pet.name}"></option>
+      </select>
+    </label>
+    <p th:if="${#fields.hasErrors('animalId')}" th:errors="*{animalId}" class="sb-error"></p>
 
-  <label>Veterinário (opcional):
-    <select id="vetSelect" th:field="*{veterinarianId}">
-      <option value="">Nenhum em especial</option>
-      <option th:each="vet : ${veterinarians}" th:value="${vet.id}"
-              th:text="${vet.name} + ' - ' + ${vet.specialty}"
-              th:attr="data-clinic=${vet.clinicId}"></option>
-    </select>
-  </label>
-  <br>
+    <label class="sb-field">
+      <span>Clínica</span>
+      <select id="clinicSelect" th:field="*{clinicId}" onchange="filterVets()">
+        <option th:each="clinic : ${clinics}" th:value="${clinic.id}" th:text="${clinic.name}"></option>
+      </select>
+    </label>
+    <p th:if="${#fields.hasErrors('clinicId')}" th:errors="*{clinicId}" class="sb-error"></p>
 
-  <label>Data:
-    <input type="date" th:field="*{date}">
-  </label>
-  <p th:if="${#fields.hasErrors('date')}" th:errors="*{date}"></p>
-  <br>
+    <label class="sb-field">
+      <span>Veterinário (opcional)</span>
+      <select id="vetSelect" th:field="*{veterinarianId}">
+        <option value="">Nenhum em especial</option>
+        <option th:each="vet : ${veterinarians}" th:value="${vet.id}"
+                th:text="${vet.name} + ' - ' + ${vet.specialty}"
+                th:attr="data-clinic=${vet.clinicId}"></option>
+      </select>
+    </label>
 
-  <label>Horário:
-    <input type="time" th:field="*{time}">
-  </label>
-  <p th:if="${#fields.hasErrors('time')}" th:errors="*{time}"></p>
-  <br>
+    <label class="sb-field">
+      <span>Data</span>
+      <input type="date" th:field="*{date}">
+    </label>
+    <p th:if="${#fields.hasErrors('date')}" th:errors="*{date}" class="sb-error"></p>
 
-  <button type="submit">Agendar</button>
-</form>
+    <label class="sb-field">
+      <span>Horário</span>
+      <input type="time" th:field="*{time}">
+    </label>
+    <p th:if="${#fields.hasErrors('time')}" th:errors="*{time}" class="sb-error"></p>
 
-<br><a th:href="@{/guardian/home}">Voltar</a>
+    <button type="submit" class="sb-btn sb-btn--orange">Agendar</button>
+  </form>
+  <a class="sb-back-link" th:href="@{/guardian/home}">Voltar</a>
+</div>
 
 <script th:inline="javascript">
   function filterVets() {

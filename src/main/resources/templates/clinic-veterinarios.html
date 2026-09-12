@@ -3,47 +3,51 @@
 <head>
     <meta charset="UTF-8">
     <title>SuperBicho - Veterinários</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
 </head>
 <body>
-<h1>Veterinários - <span th:text="${clinic.name}"></span></h1>
+<div class="sb-header">
+    <div class="sb-header__logo">🐶</div>
+    <p class="sb-header__title"><a th:href="@{/clinica/home}">SuperBicho</a></p>
+</div>
 
-<h2>Adicionar veterinário</h2>
-<form th:action="@{/clinica/veterinarios}" th:object="${veterinarianDTO}" method="post">
-    <label>Nome:
-        <input type="text" th:field="*{name}">
-    </label>
-    <p th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></p>
-    <br>
+<div class="sb-page">
+    <h2 class="sb-section-title" style="margin-top:8px;">Veterinários - <span th:text="${clinic.name}"></span></h2>
 
-    <label>Especialidade:
-        <input type="text" th:field="*{specialty}" placeholder="Ex: Clínica geral, Dermatologia, Ortopedia">
-    </label>
-    <p th:if="${#fields.hasErrors('specialty')}" th:errors="*{specialty}"></p>
-    <br>
+    <div class="sb-form-card" style="margin:0 0 24px;">
+        <h1 style="font-size:16px;">Adicionar veterinário</h1>
+        <form th:action="@{/clinica/veterinarios}" th:object="${veterinarianDTO}" method="post">
+            <label class="sb-field"><span>Nome</span><input type="text" th:field="*{name}"></label>
+            <p th:if="${#fields.hasErrors('name')}" th:errors="*{name}" class="sb-error"></p>
 
-    <button type="submit">Adicionar</button>
-</form>
+            <label class="sb-field"><span>Especialidade</span>
+                <input type="text" th:field="*{specialty}" placeholder="Ex: Clínica geral, Dermatologia, Ortopedia">
+            </label>
+            <p th:if="${#fields.hasErrors('specialty')}" th:errors="*{specialty}" class="sb-error"></p>
 
-<h2>Veterinários cadastrados</h2>
-<p th:if="${#lists.isEmpty(veterinarians)}">Nenhum veterinário cadastrado ainda.</p>
-<table th:unless="${#lists.isEmpty(veterinarians)}" border="1">
-    <tr>
-        <th>Nome</th>
-        <th>Especialidade</th>
-        <th>Ações</th>
-    </tr>
-    <tr th:each="vet : ${veterinarians}">
-        <td th:text="${vet.name}"></td>
-        <td th:text="${vet.specialty}"></td>
-        <td>
-            <form th:action="@{/clinica/veterinarios/{id}/excluir(id=${vet.id})}" method="post" style="display:inline"
-                  onsubmit="return confirm('Excluir este veterinário?');">
-                <button type="submit">Excluir</button>
-            </form>
-        </td>
-    </tr>
-</table>
+            <button type="submit" class="sb-btn sb-btn--blue">Adicionar</button>
+        </form>
+    </div>
 
-<br><a th:href="@{/clinica/home}">Voltar para o painel</a>
+    <h2 class="sb-section-title">Veterinários cadastrados</h2>
+    <p th:if="${#lists.isEmpty(veterinarians)}" class="sb-empty">Nenhum veterinário cadastrado ainda.</p>
+    <div th:unless="${#lists.isEmpty(veterinarians)}" class="sb-table-card">
+        <table>
+            <tr><th>Nome</th><th>Especialidade</th><th>Ações</th></tr>
+            <tr th:each="vet : ${veterinarians}">
+                <td th:text="${vet.name}"></td>
+                <td th:text="${vet.specialty}"></td>
+                <td>
+                    <form th:action="@{/clinica/veterinarios/{id}/excluir(id=${vet.id})}" method="post" style="display:inline"
+                          onsubmit="return confirm('Excluir este veterinário?');">
+                        <button type="submit" class="sb-btn sb-btn--danger sb-btn--sm">Excluir</button>
+                    </form>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+    <a class="sb-back-link" th:href="@{/clinica/home}">Voltar para o painel</a>
+</div>
 </body>
 </html>

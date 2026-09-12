@@ -5,135 +5,145 @@
     <title>SuperBicho - Home</title>
     <meta name="_csrf" th:content="${_csrf.token}"/>
     <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
 </head>
 <body>
-<h1>Meus pets</h1>
 
-<div th:if="${!#lists.isEmpty(vaccineAlerts)}" style="border:2px solid orange; padding:10px; margin-bottom:15px;">
-    <h2>⚠ Alerta preventivo: vacinação</h2>
-    <ul>
-        <li th:each="alert : ${vaccineAlerts}">
-            <span th:text="${alert.animalName}"></span> —
-            <span th:text="${alert.vaccineName}"></span> —
-            <span th:text="${alert.calendarStatus == 'ATRASADA'} ? 'atrasada!' : (${alert.calendarStatus == 'NUNCA_APLICADA'} ? 'nunca aplicada' : 'vence em breve')"></span>
-            <span th:if="${alert.nextDueDate != null}">(previsão: <span th:text="${alert.nextDueDate}"></span>)</span>
-        </li>
-    </ul>
+<div class="sb-header">
+    <div class="sb-header__logo">🐶</div>
+    <p class="sb-header__title">SuperBicho</p>
+    <form th:action="@{/logout}" method="post" class="sb-header__logout">
+        <button type="submit">Sair</button>
+    </form>
 </div>
 
-<div th:if="${seasonAlert != null}" style="border:2px solid steelblue; padding:10px; margin-bottom:15px;">
-    <h2>⚠ Alerta preventivo: clima (<span th:text="${seasonAlert.title}"></span>)</h2>
-    <p th:text="${seasonAlert.message}"></p>
-    <a th:href="${seasonAlert.linkUrl}" target="_blank" rel="noopener" th:text="${seasonAlert.linkLabel}"></a>
-</div>
+<div class="sb-page">
 
-<div style="border:1px solid #999; padding:10px; margin-bottom:15px;">
-    <h2>Lembretes</h2>
-    <ul>
-        <li th:each="appointment : ${appointments}" th:if="${appointment.status == 'AGENDADO'}">
-            Consulta de <span th:text="${appointment.animalName}"></span> em
-            <span th:text="${appointment.clinicName}"></span> —
-            <span th:text="${appointment.date}"></span> às <span th:text="${appointment.time}"></span>
-        </li>
-        <li th:each="checkUp : ${checkUps}" th:if="${checkUp.status == 'PENDENTE'}">
-            Exame (<span th:text="${checkUp.checkUpType}"></span>) de
-            <span th:text="${checkUp.animalName}"></span> em
-            <span th:text="${checkUp.clinicName}"></span> —
-            <span th:text="${checkUp.checkUpDate}"></span>
-        </li>
-    </ul>
-</div>
+    <div th:if="${!#lists.isEmpty(vaccineAlerts)}" class="sb-alert sb-alert--vaccine">
+        <h2>⚠ Alerta preventivo: vacinação</h2>
+        <ul>
+            <li th:each="alert : ${vaccineAlerts}">
+                <span th:text="${alert.animalName}"></span> —
+                <span th:text="${alert.vaccineName}"></span> —
+                <span th:text="${alert.calendarStatus == 'ATRASADA'} ? 'atrasada!' : (${alert.calendarStatus == 'NUNCA_APLICADA'} ? 'nunca aplicada' : 'vence em breve')"></span>
+                <span th:if="${alert.nextDueDate != null}">(previsão: <span th:text="${alert.nextDueDate}"></span>)</span>
+            </li>
+        </ul>
+    </div>
 
-<p th:if="${#lists.isEmpty(animals)}">Você ainda não cadastrou nenhum pet.</p>
+    <div th:if="${seasonAlert != null}" class="sb-alert sb-alert--season">
+        <h2>⚠ Alerta preventivo: clima (<span th:text="${seasonAlert.title}"></span>)</h2>
+        <p th:text="${seasonAlert.message}" style="margin:0 0 4px;"></p>
+        <a th:href="${seasonAlert.linkUrl}" target="_blank" rel="noopener" th:text="${seasonAlert.linkLabel}"></a>
+    </div>
 
-<table th:unless="${#lists.isEmpty(animals)}" border="1">
-    <tr>
-        <th>Nome</th><th>Espécie</th><th>Idade</th><th>Peso</th><th>Histórico</th><th>Vacinas</th><th>Excluir</th>
-    </tr>
-    <tr th:each="animal : ${animals}">
-        <td th:text="${animal.name}"></td>
-        <td th:text="${animal.species}"></td>
-        <td th:text="${animal.age}"></td>
-        <td th:text="${animal.weight}"></td>
-        <td><a th:href="@{'/guardian/pet/' + ${animal.id} + '/historico'}">Ver histórico</a></td>
-        <td><a th:href="@{'/guardian/pet/' + ${animal.id} + '/vacinas'}">Vacinas</a></td>
-        <td>
-            <button type="button" th:attr="onclick=|excluirAnimal(${animal.id})|">Excluir</button>
-        </td>
-    </tr>
-</table>
+    <div class="sb-alert" style="background:#f4f4f4; border:1px solid var(--sb-border);">
+        <h2 style="color:var(--sb-teal-dark);">Lembretes</h2>
+        <ul>
+            <li th:each="appointment : ${appointments}" th:if="${appointment.status == 'AGENDADO'}">
+                Consulta de <span th:text="${appointment.animalName}"></span> em
+                <span th:text="${appointment.clinicName}"></span> —
+                <span th:text="${appointment.date}"></span> às <span th:text="${appointment.time}"></span>
+            </li>
+            <li th:each="checkUp : ${checkUps}" th:if="${checkUp.status == 'PENDENTE'}">
+                Exame (<span th:text="${checkUp.checkUpType}"></span>) de
+                <span th:text="${checkUp.animalName}"></span> em
+                <span th:text="${checkUp.clinicName}"></span> —
+                <span th:text="${checkUp.checkUpDate}"></span>
+            </li>
+        </ul>
+    </div>
 
-<h2>Meus agendamentos</h2>
-<p th:if="${#lists.isEmpty(appointments)}">Nenhum agendamento ainda.</p>
-<table th:unless="${#lists.isEmpty(appointments)}" border="1">
-    <tr>
-        <th>Pet</th>
-        <th>Clínica</th>
-        <th>Veterinário</th>
-        <th>Data</th>
-        <th>Horário</th>
-        <th>Status</th>
-        <th>Motivo do cancelamento</th>
-        <th>Ações</th>
-    </tr>
-    <tr th:each="appointment : ${appointments}">
-        <td th:text="${appointment.animalName}"></td>
-        <td th:text="${appointment.clinicName}"></td>
-        <td th:text="${appointment.veterinarianName}"></td>
-        <td th:text="${appointment.date}"></td>
-        <td th:text="${appointment.time}"></td>
-        <td th:text="${appointment.status}"></td>
-        <td th:text="${appointment.cancelReason}"></td>
-        <td>
-            <div th:if="${appointment.status == 'AGENDADO'}">
+    <h2 class="sb-section-title" id="pets">Meus pets</h2>
+    <p th:if="${#lists.isEmpty(animals)}" class="sb-empty">Você ainda não cadastrou nenhum pet.</p>
+
+    <div th:unless="${#lists.isEmpty(animals)}" class="sb-list">
+        <div class="sb-card" th:each="animal : ${animals}">
+            <div class="sb-card__info">
+                <div class="sb-card__title" th:text="${animal.name}"></div>
+                <div class="sb-card__subtitle">
+                    <span th:text="${animal.species}"></span> ·
+                    <span th:text="${animal.age}"></span> anos ·
+                    <span th:text="${animal.weight}"></span> kg
+                </div>
+            </div>
+            <div class="sb-card__actions">
+                <a class="sb-btn sb-btn--outline sb-btn--sm" th:href="@{'/guardian/pet/' + ${animal.id} + '/historico'}">Histórico</a>
+                <a class="sb-btn sb-btn--blue sb-btn--sm" th:href="@{'/guardian/pet/' + ${animal.id} + '/vacinas'}">Vacinas</a>
+                <button type="button" class="sb-btn sb-btn--danger sb-btn--sm" th:attr="onclick=|excluirAnimal(${animal.id})|">Excluir</button>
+            </div>
+        </div>
+    </div>
+
+    <h2 class="sb-section-title" id="agendamentos">Meus agendamentos</h2>
+    <p th:if="${#lists.isEmpty(appointments)}" class="sb-empty">Nenhum agendamento ainda.</p>
+
+    <div th:unless="${#lists.isEmpty(appointments)}" class="sb-list">
+        <div class="sb-card" th:each="appointment : ${appointments}">
+            <div class="sb-card__info">
+                <div class="sb-card__title" th:text="${appointment.animalName}"></div>
+                <div class="sb-card__subtitle">
+                    <span th:text="${appointment.clinicName}"></span>
+                    <span th:if="${appointment.veterinarianName}"> · <span th:text="${appointment.veterinarianName}"></span></span>
+                </div>
+                <span class="sb-card__status"
+                      th:classappend="${appointment.status == 'AGENDADO'} ? 'sb-status--agendado' : (${appointment.status == 'CONCLUIDO'} ? 'sb-status--concluido' : 'sb-status--cancelado')"
+                      th:text="${appointment.status}"></span>
+                <div th:if="${appointment.cancelReason}" class="sb-card__subtitle">Motivo: <span th:text="${appointment.cancelReason}"></span></div>
+            </div>
+
+            <div class="sb-card__meta">
+                <strong th:text="${appointment.date}"></strong>
+                <span th:text="${appointment.time}"></span>
+            </div>
+
+            <div class="sb-card__edit" th:if="${appointment.status == 'AGENDADO'}">
                 <input type="date" th:id="'date-' + ${appointment.id}" th:value="${appointment.date}">
                 <input type="time" th:id="'time-' + ${appointment.id}" th:value="${appointment.time}">
-                <button type="button"
+                <button type="button" class="sb-btn sb-btn--blue sb-btn--sm"
                         th:attr="onclick=|alterarDataAgendamento(${appointment.id}, ${appointment.animalId}, ${appointment.clinicId}, ${appointment.veterinarianId})|">
                     Salvar
                 </button>
-                <br>
-                <a th:href="@{'/guardian/agendamento/' + ${appointment.id} + '/cancelar'}">Cancelar</a>
+                <a class="sb-btn sb-btn--outline sb-btn--sm" th:href="@{'/guardian/agendamento/' + ${appointment.id} + '/cancelar'}">Cancelar</a>
             </div>
-        </td>
-    </tr>
-</table>
+        </div>
+    </div>
 
-<h2>Meus exames</h2>
-<p th:if="${#lists.isEmpty(checkUps)}">Nenhum exame ainda.</p>
-<table th:unless="${#lists.isEmpty(checkUps)}" border="1">
-    <tr>
-        <th>Pet</th>
-        <th>Tipo</th>
-        <th>Clínica</th>
-        <th>Data</th>
-        <th>Status</th>
-        <th>Motivo do cancelamento</th>
-        <th>Ações</th>
-    </tr>
-    <tr th:each="checkUp : ${checkUps}">
-        <td th:text="${checkUp.animalName}"></td>
-        <td th:text="${checkUp.checkUpType}"></td>
-        <td th:text="${checkUp.clinicName}"></td>
-        <td th:text="${checkUp.checkUpDate}"></td>
-        <td th:text="${checkUp.status}"></td>
-        <td th:text="${checkUp.cancelReason}"></td>
-        <td>
-            <a th:if="${checkUp.status == 'PENDENTE'}"
-               th:href="@{'/guardian/exame/' + ${checkUp.id} + '/cancelar'}">Cancelar</a>
-        </td>
-    </tr>
-</table>
+    <h2 class="sb-section-title" id="exames">Meus exames</h2>
+    <p th:if="${#lists.isEmpty(checkUps)}" class="sb-empty">Nenhum exame ainda.</p>
 
-<br>
-<a th:href="@{/guardian/pet}">Cadastrar novo pet</a>
-<a th:href="@{/guardian/agendamento}">Agendar consulta</a>
-<a th:href="@{/guardian/exame}">Registrar exame</a>
-<br><a th:href="@{/}">Voltar para a Home</a>
+    <div th:unless="${#lists.isEmpty(checkUps)}" class="sb-list">
+        <div class="sb-card" th:each="checkUp : ${checkUps}">
+            <div class="sb-card__info">
+                <div class="sb-card__title" th:text="${checkUp.animalName}"></div>
+                <div class="sb-card__subtitle">
+                    <span th:text="${checkUp.checkUpType}"></span> ·
+                    <span th:text="${checkUp.clinicName}"></span>
+                </div>
+                <span class="sb-card__status"
+                      th:classappend="${checkUp.status == 'PENDENTE'} ? 'sb-status--pendente' : (${checkUp.status == 'CONCLUIDO'} ? 'sb-status--concluido' : 'sb-status--cancelado')"
+                      th:text="${checkUp.status}"></span>
+                <div th:if="${checkUp.cancelReason}" class="sb-card__subtitle">Motivo: <span th:text="${checkUp.cancelReason}"></span></div>
+            </div>
+            <div class="sb-card__meta">
+                <strong th:text="${checkUp.checkUpDate}"></strong>
+            </div>
+            <div class="sb-card__actions">
+                <a th:if="${checkUp.status == 'PENDENTE'}" class="sb-btn sb-btn--outline sb-btn--sm"
+                   th:href="@{'/guardian/exame/' + ${checkUp.id} + '/cancelar'}">Cancelar</a>
+            </div>
+        </div>
+    </div>
 
-<form th:action="@{/logout}" method="post">
-    <button type="submit">logout</button>
-</form>
+    <div style="margin-top:28px;">
+        <a class="sb-btn sb-btn--outline" th:href="@{/guardian/pet}">Cadastrar novo pet</a>
+        <a class="sb-btn sb-btn--outline" th:href="@{/guardian/exame}">Registrar exame</a>
+    </div>
+
+</div>
+
+<a class="sb-fab" th:href="@{/guardian/agendamento}">Agendar</a>
+
 <script>
     function alterarDataAgendamento(id, animalId, clinicId, veterinarianId) {
         const novaData = document.getElementById('date-' + id).value;
@@ -171,4 +181,3 @@
 </script>
 </body>
 </html>
-</parameter>

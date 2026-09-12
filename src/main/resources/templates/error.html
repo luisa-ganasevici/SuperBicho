@@ -3,19 +3,26 @@
 <head>
     <meta charset="UTF-8">
     <title>SuperBicho - Erro</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
 </head>
 <body>
-
-<div th:if="${status == 403}">
-    <h1>Acesso não permitido</h1>
-    <p>Você não tem permissão para acessar esse pet.</p>
+<div class="sb-header">
+    <div class="sb-header__logo">🐶</div>
+    <p class="sb-header__title"><a th:href="@{/}">SuperBicho</a></p>
 </div>
 
-<div th:unless="${status == 403}">
-    <h1>Ocorreu um erro</h1>
-    <p th:text="${message}">Algo deu errado.</p>
-</div>
+<div class="sb-form-card" style="text-align:center;">
+    <div th:if="${status == 403}">
+        <h1>Acesso não permitido</h1>
+        <p>Você não tem permissão para acessar esse pet.</p>
+    </div>
 
-<br><a th:href="@{/}">Voltar para a Home</a>
+    <div th:unless="${status == 403}">
+        <h1>Ocorreu um erro</h1>
+        <p th:text="${message}">Algo deu errado.</p>
+    </div>
+
+    <a class="sb-back-link" th:href="@{/}">Voltar para a Home</a>
+</div>
 </body>
 </html>

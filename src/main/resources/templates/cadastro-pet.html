@@ -3,37 +3,44 @@
 <head>
     <meta charset="UTF-8">
     <title>SuperBicho - Cadastrar Pet</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
 </head>
 <body>
-<h1>Cadastrar Pet</h1>
-<form th:action="@{/guardian/pet}" th:object="${animalDTO}" method="post">
-    <label>Nome:
-        <input type="text" th:field="*{name}">
-    </label>
-    <p th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></p>
-    <br>
+<div class="sb-header">
+    <div class="sb-header__logo">🐶</div>
+    <p class="sb-header__title"><a th:href="@{/guardian/home}">SuperBicho</a></p>
+</div>
 
-    <label>Espécie:
-        <input type="text" th:field="*{species}">
-    </label>
-    <p th:if="${#fields.hasErrors('species')}" th:errors="*{species}"></p>
-    <br>
+<div class="sb-form-card">
+    <h1>Cadastrar Pet</h1>
+    <form th:action="@{/guardian/pet}" th:object="${animalDTO}" method="post">
+        <label class="sb-field">
+            <span>Nome</span>
+            <input type="text" th:field="*{name}">
+        </label>
+        <p th:if="${#fields.hasErrors('name')}" th:errors="*{name}" class="sb-error"></p>
 
-    <label>Idade:
-        <input type="number" th:field="*{age}">
-    </label>
-    <p th:if="${#fields.hasErrors('age')}" th:errors="*{age}"></p>
-    <br>
+        <label class="sb-field">
+            <span>Espécie</span>
+            <input type="text" th:field="*{species}">
+        </label>
+        <p th:if="${#fields.hasErrors('species')}" th:errors="*{species}" class="sb-error"></p>
 
-    <label>Peso (kg):
-        <input type="number" step="0.01" th:field="*{weight}">
-    </label>
-    <p th:if="${#fields.hasErrors('weight')}" th:errors="*{weight}"></p>
-    <br>
+        <label class="sb-field">
+            <span>Idade</span>
+            <input type="number" th:field="*{age}">
+        </label>
+        <p th:if="${#fields.hasErrors('age')}" th:errors="*{age}" class="sb-error"></p>
 
-    <button type="submit">Cadastrar</button>
-</form>
+        <label class="sb-field">
+            <span>Peso (kg)</span>
+            <input type="number" step="0.01" th:field="*{weight}">
+        </label>
+        <p th:if="${#fields.hasErrors('weight')}" th:errors="*{weight}" class="sb-error"></p>
 
-<br><a th:href="@{/guardian/home}">Voltar</a>
+        <button type="submit" class="sb-btn sb-btn--orange">Cadastrar</button>
+    </form>
+    <a class="sb-back-link" th:href="@{/guardian/home}">Voltar</a>
+</div>
 </body>
 </html>

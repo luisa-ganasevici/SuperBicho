@@ -3,57 +3,47 @@
 <head>
     <meta charset="UTF-8">
     <title>SuperBicho - Cadastro Clínica</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
 </head>
 <body>
-<h1>Cadastro - Clínica</h1>
-<form th:action="@{/clinica/cadastro}" th:object="${clinic}" method="post">
-    <label>Nome da clínica:
-        <input type="text" th:field="*{name}">
-    </label>
-    <p th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></p>
-    <br>
+<div class="sb-header">
+    <div class="sb-header__logo">🐶</div>
+    <p class="sb-header__title"><a th:href="@{/}">SuperBicho</a></p>
+</div>
+<div class="sb-form-card">
+    <h1>Cadastro - Clínica</h1>
+    <form th:action="@{/clinica/cadastro}" th:object="${clinic}" method="post">
+        <label class="sb-field"><span>Nome da clínica</span><input type="text" th:field="*{name}"></label>
+        <p th:if="${#fields.hasErrors('name')}" th:errors="*{name}" class="sb-error"></p>
 
-    <label>Endereço:
-        <input type="text" th:field="*{address}">
-    </label>
-    <p th:if="${#fields.hasErrors('address')}" th:errors="*{address}"></p>
-    <br>
+        <label class="sb-field"><span>Endereço</span><input type="text" th:field="*{address}"></label>
+        <p th:if="${#fields.hasErrors('address')}" th:errors="*{address}" class="sb-error"></p>
 
-    <label>Telefone:
-        <input type="text" th:field="*{phone}">
-    </label>
-    <p th:if="${#fields.hasErrors('phone')}" th:errors="*{phone}"></p>
-    <br>
+        <label class="sb-field"><span>Telefone</span><input type="text" th:field="*{phone}"></label>
+        <p th:if="${#fields.hasErrors('phone')}" th:errors="*{phone}" class="sb-error"></p>
 
-    <label>Email:
-        <input type="text" th:field="*{email}">
-    </label>
-    <p th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></p>
-    <br>
+        <label class="sb-field"><span>Email</span><input type="text" th:field="*{email}"></label>
+        <p th:if="${#fields.hasErrors('email')}" th:errors="*{email}" class="sb-error"></p>
 
-    <label>Senha:
-        <input type="password" th:field="*{password}">
-    </label>
-    <p th:if="${#fields.hasErrors('password')}" th:errors="*{password}"></p>
-    <br>
+        <label class="sb-field"><span>Senha</span><input type="password" th:field="*{password}"></label>
+        <p th:if="${#fields.hasErrors('password')}" th:errors="*{password}" class="sb-error"></p>
 
-    <label>CNPJ (14 dígitos):
-        <input type="text" th:field="*{cnpj}">
-    </label>
-    <p th:if="${#fields.hasErrors('cnpj')}" th:errors="*{cnpj}"></p>
-    <br>
+        <label class="sb-field"><span>CNPJ (14 dígitos)</span><input type="text" th:field="*{cnpj}"></label>
+        <p th:if="${#fields.hasErrors('cnpj')}" th:errors="*{cnpj}" class="sb-error"></p>
 
-    <label>Especialidades:</label><br>
-    <label><input type="checkbox" th:field="*{specialties}" value="Clínica Geral"> Clínica Geral</label><br>
-    <label><input type="checkbox" th:field="*{specialties}" value="Cirurgia"> Cirurgia</label><br>
-    <label><input type="checkbox" th:field="*{specialties}" value="Dermatologia"> Dermatologia</label><br>
-    <label><input type="checkbox" th:field="*{specialties}" value="Cardiologia"> Cardiologia</label><br>
-    <label><input type="checkbox" th:field="*{specialties}" value="Odontologia"> Odontologia</label><br>
-    <label><input type="checkbox" th:field="*{specialties}" value="Oftalmologia"> Oftalmologia</label><br>
-    <br>
+        <div class="sb-field">
+            <span>Especialidades</span>
+            <label><input type="checkbox" th:field="*{specialties}" value="Clínica Geral"> Clínica Geral</label><br>
+            <label><input type="checkbox" th:field="*{specialties}" value="Cirurgia"> Cirurgia</label><br>
+            <label><input type="checkbox" th:field="*{specialties}" value="Dermatologia"> Dermatologia</label><br>
+            <label><input type="checkbox" th:field="*{specialties}" value="Cardiologia"> Cardiologia</label><br>
+            <label><input type="checkbox" th:field="*{specialties}" value="Odontologia"> Odontologia</label><br>
+            <label><input type="checkbox" th:field="*{specialties}" value="Oftalmologia"> Oftalmologia</label>
+        </div>
 
-    <button type="submit">Cadastrar</button>
-</form>
-<br><a th:href="@{/}">Voltar para a Home</a>
+        <button type="submit" class="sb-btn sb-btn--blue">Cadastrar</button>
+    </form>
+    <a class="sb-back-link" th:href="@{/}">Voltar para a Home</a>
+</div>
 </body>
 </html>

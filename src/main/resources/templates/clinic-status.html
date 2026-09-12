@@ -3,30 +3,38 @@
 <head>
     <meta charset="UTF-8">
     <title>SuperBicho - Status da Clínica</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
 </head>
 <body>
-<h1>Olá, <span th:text="${clinic.name}">Clínica</span></h1>
-
-<p th:if="${notice}" style="color:red; font-weight:bold" th:text="${notice}"></p>
-
-<div th:if="${clinic.clinicStatus.name() == 'PENDING'}">
-    <p>Sua clínica está sendo analisada para aprovação de credenciados. Por favor, aguarde.</p>
+<div class="sb-header">
+    <div class="sb-header__logo">🐶</div>
+    <p class="sb-header__title">SuperBicho</p>
+    <form th:action="@{/clinica/logout}" method="post" class="sb-header__logout">
+        <button type="submit">Sair</button>
+    </form>
 </div>
 
-<div th:if="${clinic.clinicStatus.name() == 'APPROVED'}">
-    <p>Sua clínica foi aprovada! Bem-vinda ao SuperBicho.</p>
-    <a th:href="@{/clinica/home}">Acessar painel</a>
-</div>
+<div class="sb-page">
+    <h2 class="sb-section-title" style="margin-top:8px;">Olá, <span th:text="${clinic.name}">Clínica</span></h2>
 
-<div th:if="${clinic.clinicStatus.name() == 'DENIED'}">
-    <p>Seu cadastro não foi aprovado. Entre em contato com o suporte para mais informações.</p>
-</div>
+    <p th:if="${notice}" class="sb-alert sb-alert--vaccine" th:text="${notice}"></p>
 
-<div th:if="${clinic.clinicStatus.name() == 'REMOVED'}">
-    <p>Sua clínica foi desativada do cadastro da SuperBicho. Caso tenha dúvidas, entre em contato conosco.</p>
+    <div th:if="${clinic.clinicStatus.name() == 'PENDING'}" class="sb-card">
+        <div class="sb-card__info">Sua clínica está sendo analisada para aprovação de credenciados. Por favor, aguarde.</div>
+    </div>
+
+    <div th:if="${clinic.clinicStatus.name() == 'APPROVED'}" class="sb-card">
+        <div class="sb-card__info">Sua clínica foi aprovada! Bem-vinda ao SuperBicho.</div>
+        <a class="sb-btn sb-btn--blue" th:href="@{/clinica/home}">Acessar painel</a>
+    </div>
+
+    <div th:if="${clinic.clinicStatus.name() == 'DENIED'}" class="sb-card">
+        <div class="sb-card__info">Seu cadastro não foi aprovado. Entre em contato com o suporte para mais informações.</div>
+    </div>
+
+    <div th:if="${clinic.clinicStatus.name() == 'REMOVED'}" class="sb-card">
+        <div class="sb-card__info">Sua clínica foi desativada do cadastro da SuperBicho. Caso tenha dúvidas, entre em contato conosco.</div>
+    </div>
 </div>
-<form th:action="@{/clinica/logout}" method="post">
-    <button type="submit">logout</button>
-</form>
 </body>
 </html>

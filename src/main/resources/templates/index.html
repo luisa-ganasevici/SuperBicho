@@ -3,21 +3,30 @@
 <head>
     <meta charset="UTF-8">
     <title>SuperBicho</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
 </head>
 <body>
-<h1>SuperBicho</h1>
-<p>Sistema de gestão veterinária.</p>
+<div class="sb-landing">
+    <div class="sb-landing__logo">🐶</div>
+    <h1>SuperBicho</h1>
+    <p class="sb-tagline">Sistema de gestão veterinária.</p>
 
-<h2>Tutor</h2>
-<a th:href="@{/login}">Login</a> |
-<a th:href="@{/cadastro}">Cadastrar</a>
+    <div class="sb-landing__group">
+        <h2>Tutor</h2>
+        <a class="sb-btn sb-btn--orange" th:href="@{/login}">Login</a>
+        <a class="sb-btn sb-btn--outline" th:href="@{/cadastro}">Cadastrar</a>
+    </div>
 
-<h2>Clínica</h2>
-<a th:href="@{/clinica/login}">Login</a> |
-<a th:href="@{/clinica/cadastro}">Cadastrar</a>
+    <div class="sb-landing__group">
+        <h2>Clínica</h2>
+        <a class="sb-btn sb-btn--blue" th:href="@{/clinica/login}">Login</a>
+        <a class="sb-btn sb-btn--outline" th:href="@{/clinica/cadastro}">Cadastrar</a>
+    </div>
 
-<h2>Administrador</h2>
-<a th:href="@{/adm/login}">Login</a>
-
+    <div class="sb-landing__group">
+        <h2>Administrador</h2>
+        <a class="sb-btn sb-btn--outline" th:href="@{/adm/login}">Login</a>
+    </div>
+</div>
 </body>
 </html>

@@ -3,50 +3,62 @@
 <head>
     <meta charset="UTF-8">
     <title>SuperBicho - Histórico do Pet</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
 </head>
 <body>
-<h1>Histórico - <span th:text="${animal.name}"></span></h1>
+<div class="sb-header">
+    <div class="sb-header__logo">🐶</div>
+    <p class="sb-header__title"><a th:href="@{/guardian/home}">SuperBicho</a></p>
+</div>
 
-<h2>Agendamentos</h2>
-<p th:if="${#lists.isEmpty(appointments)}">Nenhum agendamento para este pet.</p>
-<table th:unless="${#lists.isEmpty(appointments)}" border="1">
-    <tr>
-        <th>Clínica</th>
-        <th>Veterinário</th>
-        <th>Data</th>
-        <th>Horário</th>
-        <th>Status</th>
-        <th>Motivo do cancelamento</th>
-    </tr>
-    <tr th:each="appointment : ${appointments}">
-        <td th:text="${appointment.clinicName}"></td>
-        <td th:text="${appointment.veterinarianName}"></td>
-        <td th:text="${appointment.date}"></td>
-        <td th:text="${appointment.time}"></td>
-        <td th:text="${appointment.status}"></td>
-        <td th:text="${appointment.cancelReason}"></td>
-    </tr>
-</table>
+<div class="sb-page">
+    <h1 style="color:var(--sb-teal-dark);">Histórico - <span th:text="${animal.name}"></span></h1>
 
-<h2>Exames</h2>
-<p th:if="${#lists.isEmpty(checkUps)}">Nenhum exame para este pet.</p>
-<table th:unless="${#lists.isEmpty(checkUps)}" border="1">
-    <tr>
-        <th>Tipo</th>
-        <th>Clínica</th>
-        <th>Data</th>
-        <th>Status</th>
-        <th>Motivo do cancelamento</th>
-    </tr>
-    <tr th:each="checkUp : ${checkUps}">
-        <td th:text="${checkUp.checkUpType}"></td>
-        <td th:text="${checkUp.clinicName}"></td>
-        <td th:text="${checkUp.checkUpDate}"></td>
-        <td th:text="${checkUp.status}"></td>
-        <td th:text="${checkUp.cancelReason}"></td>
-    </tr>
-</table>
+    <h2 class="sb-section-title">Agendamentos</h2>
+    <p th:if="${#lists.isEmpty(appointments)}" class="sb-empty">Nenhum agendamento para este pet.</p>
+    <div th:unless="${#lists.isEmpty(appointments)}" class="sb-table-card">
+        <table>
+            <tr>
+                <th>Clínica</th>
+                <th>Veterinário</th>
+                <th>Data</th>
+                <th>Horário</th>
+                <th>Status</th>
+                <th>Motivo do cancelamento</th>
+            </tr>
+            <tr th:each="appointment : ${appointments}">
+                <td th:text="${appointment.clinicName}"></td>
+                <td th:text="${appointment.veterinarianName}"></td>
+                <td th:text="${appointment.date}"></td>
+                <td th:text="${appointment.time}"></td>
+                <td th:text="${appointment.status}"></td>
+                <td th:text="${appointment.cancelReason}"></td>
+            </tr>
+        </table>
+    </div>
 
-<br><a th:href="@{/guardian/home}">Voltar</a>
+    <h2 class="sb-section-title">Exames</h2>
+    <p th:if="${#lists.isEmpty(checkUps)}" class="sb-empty">Nenhum exame para este pet.</p>
+    <div th:unless="${#lists.isEmpty(checkUps)}" class="sb-table-card">
+        <table>
+            <tr>
+                <th>Tipo</th>
+                <th>Clínica</th>
+                <th>Data</th>
+                <th>Status</th>
+                <th>Motivo do cancelamento</th>
+            </tr>
+            <tr th:each="checkUp : ${checkUps}">
+                <td th:text="${checkUp.checkUpType}"></td>
+                <td th:text="${checkUp.clinicName}"></td>
+                <td th:text="${checkUp.checkUpDate}"></td>
+                <td th:text="${checkUp.status}"></td>
+                <td th:text="${checkUp.cancelReason}"></td>
+            </tr>
+        </table>
+    </div>
+
+    <a class="sb-back-link" th:href="@{/guardian/home}">Voltar</a>
+</div>
 </body>
 </html>

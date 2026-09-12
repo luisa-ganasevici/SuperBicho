@@ -3,20 +3,27 @@
 <head>
     <meta charset="UTF-8">
     <title>SuperBicho - Cancelar</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
 </head>
 <body>
-<h1 th:text="${title}">Cancelar</h1>
+<div class="sb-header">
+    <div class="sb-header__logo">🐶</div>
+    <p class="sb-header__title">SuperBicho</p>
+</div>
 
-<form th:action="@{${targetUrl}}" th:object="${cancelDTO}" method="post">
-    <label>Motivo do cancelamento:
-        <textarea th:field="*{reason}" required></textarea>
-    </label>
-    <p th:if="${#fields.hasErrors('reason')}" th:errors="*{reason}"></p>
-    <br>
+<div class="sb-form-card">
+    <h1 th:text="${title}">Cancelar</h1>
 
-    <button type="submit">Confirmar cancelamento</button>
-</form>
+    <form th:action="@{${targetUrl}}" th:object="${cancelDTO}" method="post">
+        <label class="sb-field">
+            <span>Motivo do cancelamento</span>
+            <textarea th:field="*{reason}" required rows="4"></textarea>
+        </label>
+        <p th:if="${#fields.hasErrors('reason')}" th:errors="*{reason}" class="sb-error"></p>
 
-<br><a href="javascript:history.back()">Voltar</a>
+        <button type="submit" class="sb-btn sb-btn--danger">Confirmar cancelamento</button>
+    </form>
+    <a class="sb-back-link" href="javascript:history.back()">Voltar</a>
+</div>
 </body>
 </html>

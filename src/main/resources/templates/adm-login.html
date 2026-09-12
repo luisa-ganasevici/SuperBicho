@@ -1,14 +1,24 @@
 <!DOCTYPE html>
 <html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
-<head><meta charset="UTF-8"><title>SuperBicho - Login Adm</title></head>
+<head>
+    <meta charset="UTF-8">
+    <title>SuperBicho - Login Adm</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
 <body>
-<h1>Login - Administrador</h1>
-<form th:action="@{/adm/login}" method="post">
-    <label>Email: <input type="text" name="username" required></label><br>
-    <label>Senha: <input type="password" name="password" required></label><br>
-    <button type="submit">Entrar</button>
-    <p th:if="${param.error}" style="color:red;">Email ou senha incorretos.</p>
-</form>
-<br><a th:href="@{/}">Voltar para a Home</a>
+<div class="sb-header">
+    <div class="sb-header__logo">🐶</div>
+    <p class="sb-header__title"><a th:href="@{/}">SuperBicho</a></p>
+</div>
+<div class="sb-form-card">
+    <h1>Login - Administrador</h1>
+    <form th:action="@{/adm/login}" method="post">
+        <label class="sb-field"><span>Email</span><input type="text" name="username" required></label>
+        <label class="sb-field"><span>Senha</span><input type="password" name="password" required></label>
+        <p th:if="${param.error}" class="sb-error">Email ou senha incorretos.</p>
+        <button type="submit" class="sb-btn sb-btn--outline" style="border-color:var(--sb-teal); color:var(--sb-teal-dark);">Entrar</button>
+    </form>
+    <a class="sb-back-link" th:href="@{/}">Voltar para a Home</a>
+</div>
 </body>
 </html>
