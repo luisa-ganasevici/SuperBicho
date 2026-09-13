@@ -10,12 +10,13 @@ Aplicação web para gestão de cuidados de pets, conectando **Tutores**, **Clí
 - Oracle Database (fornecido pela FIAP)
 - Gradle
 - Docker
+- JUnit 5 + Mockito (testes unitários)
 
 ## Pré-requisitos
 
 - [Java 21](https://adoptium.net/) instalado (necessário apenas se for rodar sem Docker)
 - [Docker](https://www.docker.com/) instalado (necessário apenas se for rodar via container)
-- Acesso ao banco Oracle da FIAP (`oracle.fiap.com.br:1521:orcl`) com usuário e senha válidos
+- Acesso a um banco Oracle com usuário e senha válidos
 
 Não é necessário instalar o Gradle — o projeto já vem com o Gradle Wrapper (`gradlew`).
 
@@ -28,15 +29,26 @@ git clone <url-do-repositorio>
 cd SuperBicho
 ```
 
-As credenciais do banco de dados são lidas de variáveis de ambiente:
+As credenciais do banco de dados são lidas de variáveis de ambiente **obrigatórias** — sem elas, a aplicação não sobe:
 
-| Variável | Descrição | Valor padrão (dev) |
+| Variável | Descrição | Obrigatória? |
 |---|---|---|
-| `DB_USER` | Usuário do Oracle | `rm563403` |
-| `DB_PASSWORD` | Senha do Oracle | `230107` |
-| `PORT` | Porta em que a aplicação sobe | `8082` |
+| `DB_USER` | Usuário do Oracle | Sim |
+| `DB_PASSWORD` | Senha do Oracle | Sim |
+| `PORT` | Porta em que a aplicação sobe | Não — usa `8080` por padrão |
 
-Se as variáveis não forem definidas, a aplicação usa os valores padrão configurados em `application.yaml` (úteis para rodar localmente pela IDE).
+Defina as variáveis no seu terminal antes de rodar:
+
+```bash
+export DB_USER=seu_usuario
+export DB_PASSWORD=sua_senha
+```
+
+No Windows (PowerShell):
+```powershell
+$env:DB_USER="seu_usuario"
+$env:DB_PASSWORD="sua_senha"
+```
 
 ## Execução
 
@@ -51,7 +63,7 @@ No Windows:
 gradlew.bat bootRun
 ```
 
-A aplicação sobe em `http://localhost:8082`. O Flyway executa as migrations automaticamente na inicialização — não é necessário rodar nenhum script manualmente.
+A aplicação sobe em `http://localhost:8080`. O Flyway executa as migrations automaticamente na inicialização — não é necessário rodar nenhum script manualmente.
 
 ### Opção 2 — Com Docker
 
@@ -62,17 +74,27 @@ docker build -t superbicho .
 
 **Executar o container:**
 ```bash
-docker run -p 8082:8082 \
-  -e DB_USER=rm563403 \
-  -e DB_PASSWORD=230107 \
+docker run -p 8080:8080 \
+  -e DB_USER=seu_usuario \
+  -e DB_PASSWORD=sua_senha \
   superbicho
 ```
 
-A aplicação estará disponível em `http://localhost:8082`.
+A aplicação estará disponível em `http://localhost:8080`.
 
 ### Deploy (Railway / Render)
 
 A plataforma builda a imagem a partir do `Dockerfile` na raiz do projeto automaticamente. Configure as variáveis de ambiente `DB_USER` e `DB_PASSWORD` no painel do serviço (aba **Variables**, no Railway, ou **Environment**, no Render) — não é necessário configurar `PORT`, a plataforma injeta a sua própria porta automaticamente e a aplicação já está preparada para escutar nela.
+
+## Testes
+
+O projeto tem testes unitários das camadas de serviço, usando JUnit 5 e Mockito como dublê de teste para isolar a lógica de negócio dos repositórios.
+
+```bash
+./gradlew test
+```
+
+O relatório é gerado em `build/reports/tests/test/index.html`.
 
 ## Acesso
 
@@ -80,13 +102,11 @@ A aplicação tem três perfis de usuário, cada um com sua própria tela de log
 
 | Perfil | Rota de login | Cadastro |
 |---|---|---|
-| Tutor | `http://localhost:8082/login` | `http://localhost:8082/cadastro` (auto-cadastro) |
-| Clínica | `http://localhost:8082/clinica/login` | `http://localhost:8082/clinica/cadastro` (fica **pendente** até um Admin aprovar) |
-| Administrador | `http://localhost:8082/adm/login` | Não há cadastro público — o primeiro Admin já vem pré-cadastrado via migration (`V3__seed_admin.sql`), e novos Admins só podem ser criados por um Admin já autenticado |
+| Tutor | `http://localhost:8080/login` | `http://localhost:8080/cadastro` (auto-cadastro) |
+| Clínica | `http://localhost:8080/clinica/login` | `http://localhost:8080/clinica/cadastro` (fica **pendente** até um Admin aprovar) |
+| Administrador | `http://localhost:8080/adm/login` | Não há cadastro público pela interface |
 
-**Login do Administrador padrão (seed):**
-- Email: `luisa@gmail.com`
-- Senha: a senha definida no momento em que o hash em `V3__seed_admin.sql` foi gerado
+> Não existe nenhuma forma de criar um Administrador pela aplicação web — não há rota de cadastro para esse perfil. Um Admin só pode ser criado inserindo diretamente um registro na tabela `SB_TB_ADM` do banco (com a senha já em hash BCrypt). **Se você for rodar a aplicação com um banco de dados próprio** (diferente do usado no desenvolvimento), vai precisar fazer esse insert manual antes de conseguir logar como Administrador.
 
 Após o login, cada perfil é redirecionado para sua respectiva home:
 - Tutor → `/guardian/home`
