@@ -116,3 +116,9 @@ Após o login, cada perfil é redirecionado para sua respectiva home:
 ## Estrutura do banco
 
 As tabelas e dados iniciais são criados automaticamente pelo Flyway a partir dos scripts em `src/main/resources/db/migration`, executados na ordem `V1` a `V10` na primeira inicialização da aplicação.
+
+
+## Links
+
+- **Aplicação em produção:** https://superbicho.onrender.com
+- **Vídeo de demonstração:** https://youtu.be/7f1usMVVaGY?si=soycBM_Vya2pX4gC
