@@ -66,10 +66,10 @@ public class VeterinarianService {
         String nome = veterinarian.getName();
         Integer clinicId = veterinarian.getClinic().getId();
 
-        // Mantém a regra: consultas agendadas com este veterinário são canceladas.
+
         appointmentService.cancelAllByVeterinarian(id, MOTIVO_CANCELAMENTO_VET);
 
-        // Exames não são cancelados: eles pertencem somente à clínica.
+
         clinicService.setNotice(
                 clinicId,
                 "Seu veterinário " + nome
