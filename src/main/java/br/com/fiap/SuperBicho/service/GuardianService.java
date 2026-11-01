@@ -32,6 +32,9 @@ public class GuardianService {
     public Guardian findByEmail(String email) {
         return guardianRepository.findByEmail(email).orElseThrow(() -> notFound()); }
 
+    public Integer findIdByEmail(String email) {
+        return findByEmail(email).getId(); }
+
     @CacheEvict(value = {"guardians", "guardianById", "animals", "animalById"}, allEntries = true)
     public GuardianResponseDTO create(GuardianRequestDTO dto) {
         Guardian guardian = new Guardian();

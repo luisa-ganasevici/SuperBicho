@@ -30,7 +30,7 @@ public class AppointmentServiceTest {
     private HistoryRepository historyRepository;
 
     @Mock
-    private AnimalRepository animalRepository;
+    private AnimalService animalService;
 
     @Mock
     private ClinicRepository clinicRepository;
@@ -63,7 +63,7 @@ public class AppointmentServiceTest {
         clinic.setName("Clinica Boa Vida");
         clinic.setClinicStatus(ClinicStatus.APPROVED);
 
-        appointmentRequestDTO = new AppointmentRequestDTO("2026-10-10", "14:00", "AGENDADO", 1, 1, null);
+        appointmentRequestDTO = new AppointmentRequestDTO("2026-10-10", "14:00", 1, 1, null);
 
         appointment = new Appointment(1, "2026-10-10", "14:00", "AGENDADO", null, animal, clinic, null);
     }
@@ -71,12 +71,12 @@ public class AppointmentServiceTest {
     @Test
     public void deveAgendarConsultaComSucesso() {
         // arrange
-        when(animalRepository.findById(1)).thenReturn(Optional.of(animal));
+        when(animalService.findOwnedEntity(1, 1)).thenReturn(animal);
         when(clinicRepository.findById(1)).thenReturn(Optional.of(clinic));
         when(appointmentRepository.save(any(Appointment.class))).thenReturn(appointment);
 
         // act
-        AppointmentResponseDTO response = appointmentService.create(appointmentRequestDTO);
+        AppointmentResponseDTO response = appointmentService.create(1, appointmentRequestDTO);
 
         // assert
         assertEquals("AGENDADO", response.getStatus());
@@ -88,10 +88,56 @@ public class AppointmentServiceTest {
     @Test
     public void deveLancarExcecaoAoAgendarComAnimalInexistente() {
         // arrange
-        when(animalRepository.findById(1)).thenReturn(Optional.empty());
+        when(animalService.findOwnedEntity(1, 1)).thenThrow(new ResponseStatusException(HttpStatus.NOT_FOUND, "Animal not found"));
 
         // act + assert
-        assertThrows(ResponseStatusException.class, () -> appointmentService.create(appointmentRequestDTO));
+        assertThrows(ResponseStatusException.class, () -> appointmentService.create(1, appointmentRequestDTO));
+        verify(appointmentRepository, never()).save(any());
+    }
+
+    @Test
+    public void deveImpedirAgendarConsultaParaPetDeOutroTutor() {
+        // arrange
+        when(animalService.findOwnedEntity(1, 99)).thenThrow(new ResponseStatusException(HttpStatus.FORBIDDEN, "This pet does not belong to you"));
+
+        // act + assert
+        ResponseStatusException exception = assertThrows(ResponseStatusException.class,
+                () -> appointmentService.create(99, appointmentRequestDTO));
+        assertEquals(HttpStatus.FORBIDDEN, exception.getStatusCode());
+        verify(appointmentRepository, never()).save(any());
+    }
+
+    @Test
+    public void deveImpedirVisualizarConsultaDeOutroTutor() {
+        // arrange
+        when(appointmentRepository.findById(1)).thenReturn(Optional.of(appointment));
+
+        // act + assert
+        ResponseStatusException exception = assertThrows(ResponseStatusException.class,
+                () -> appointmentService.findByIdForGuardian(1, 99));
+        assertEquals(HttpStatus.FORBIDDEN, exception.getStatusCode());
+    }
+
+    @Test
+    public void deveImpedirAlterarConsultaDeOutroTutor() {
+        // arrange
+        when(appointmentRepository.findById(1)).thenReturn(Optional.of(appointment));
+
+        // act + assert
+        ResponseStatusException exception = assertThrows(ResponseStatusException.class,
+                () -> appointmentService.update(1, 99, appointmentRequestDTO));
+        assertEquals(HttpStatus.FORBIDDEN, exception.getStatusCode());
+        verify(appointmentRepository, never()).save(any());
+    }
+
+    @Test
+    public void deveImpedirAlterarConsultaJaCancelada() {
+        // arrange
+        appointment.setStatus("CANCELADO");
+        when(appointmentRepository.findById(1)).thenReturn(Optional.of(appointment));
+
+        // act + assert
+        assertThrows(ResponseStatusException.class, () -> appointmentService.update(1, 1, appointmentRequestDTO));
         verify(appointmentRepository, never()).save(any());
     }
 
