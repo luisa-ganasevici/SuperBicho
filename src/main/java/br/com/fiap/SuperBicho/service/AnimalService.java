@@ -7,7 +7,6 @@ import br.com.fiap.SuperBicho.repository.*;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.*;
-import org.springframework.data.domain.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -18,39 +17,38 @@ public class AnimalService {
     private final AnimalRepository animalRepository;
     private final GuardianRepository guardianRepository;
 
-    @Cacheable("animals")
-    public Page<AnimalResponseDTO> findAll(Pageable pageable) {
-        return animalRepository.findAllWithGuardian(pageable).map(this::toResponse); }
-
-    @Cacheable(value = "animalsBySpecies", key = "#species + '-' + #pageable.pageNumber")
-    public Page<AnimalResponseDTO> findBySpecies(String species, Pageable pageable) {
-        return animalRepository.findBySpecies(species, pageable).map(this::toResponse); }
-
     @Cacheable(value = "animalsByGuardian", key = "#guardianId")
     public List<AnimalResponseDTO> findByGuardian(Integer guardianId) {
         return animalRepository.findByGuardianId(guardianId).stream().map(this::toResponse).toList(); }
 
-    @Cacheable(value = "animalById", key = "#id")
-    public AnimalResponseDTO findById(Integer id) {
-        return toResponse(findEntityById(id)); }
+    public AnimalResponseDTO findByIdForGuardian(Integer id, Integer guardianId) {
+        return toResponse(findOwnedEntity(id, guardianId)); }
 
-    @CacheEvict(value = {"animals", "animalsBySpecies", "animalsByGuardian", "animalById"}, allEntries = true)
-    public AnimalResponseDTO create(AnimalRequestDTO dto) {
-        return toResponse(animalRepository.save(toEntity(new Animal(), dto))); }
+    @CacheEvict(value = "animalsByGuardian", allEntries = true)
+    public AnimalResponseDTO create(Integer guardianId, AnimalRequestDTO dto) {
+        Guardian guardian = guardianRepository.findById(guardianId).orElseThrow(() -> notFound("Guardian"));
+        Animal animal = new Animal();
+        animal.setGuardian(guardian);
+        return toResponse(animalRepository.save(copyFields(animal, dto))); }
 
-    @CacheEvict(value = {"animals", "animalsBySpecies", "animalsByGuardian", "animalById"}, allEntries = true)
-    public AnimalResponseDTO update(Integer id, AnimalRequestDTO dto) {
-        return toResponse(animalRepository.save(toEntity(findEntityById(id), dto))); }
+    @CacheEvict(value = "animalsByGuardian", allEntries = true)
+    public AnimalResponseDTO update(Integer id, Integer guardianId, AnimalRequestDTO dto) {
+        return toResponse(animalRepository.save(copyFields(findOwnedEntity(id, guardianId), dto))); }
 
-    @CacheEvict(value = {"animals", "animalsBySpecies", "animalsByGuardian", "animalById"}, allEntries = true)
-    public void deleteById(Integer id) { if (!animalRepository.existsById(id)) throw notFound("Animal"); animalRepository.deleteById(id); }
+    @CacheEvict(value = "animalsByGuardian", allEntries = true)
+    public void deleteById(Integer id, Integer guardianId) {
+        animalRepository.delete(findOwnedEntity(id, guardianId)); }
 
-    public Animal findEntityById(Integer id) {
-        return animalRepository.findById(id).orElseThrow(() -> notFound("Animal")); }
+    public Animal findOwnedEntity(Integer id, Integer guardianId) {
+        Animal animal = animalRepository.findById(id).orElseThrow(() -> notFound("Animal"));
+        if (!animal.getGuardian().getId().equals(guardianId)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "This pet does not belong to you");
+        }
+        return animal;
+    }
 
-    private Animal toEntity(Animal animal, AnimalRequestDTO dto) {
-        Guardian guardian = guardianRepository.findById(dto.getGuardianId()).orElseThrow(() -> notFound("Guardian"));
-        animal.setName(dto.getName()); animal.setSpecies(dto.getSpecies()); animal.setAge(dto.getAge()); animal.setWeight(dto.getWeight()); animal.setGuardian(guardian);
+    private Animal copyFields(Animal animal, AnimalRequestDTO dto) {
+        animal.setName(dto.getName()); animal.setSpecies(dto.getSpecies()); animal.setAge(dto.getAge()); animal.setWeight(dto.getWeight());
         return animal;
     }
 

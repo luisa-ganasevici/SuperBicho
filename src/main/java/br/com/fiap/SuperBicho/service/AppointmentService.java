@@ -7,7 +7,6 @@ import br.com.fiap.SuperBicho.entity.*;
 import br.com.fiap.SuperBicho.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.*;
-import org.springframework.data.domain.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -23,28 +22,18 @@ public class AppointmentService {
 
     private final AppointmentRepository appointmentRepository;
     private final HistoryRepository historyRepository;
-    private final AnimalRepository animalRepository;
+    private final AnimalService animalService;
     private final ClinicRepository clinicRepository;
     private final VeterinarianRepository veterinarianRepository;
 
-    @Cacheable("appointments")
-    public Page<AppointmentResponseDTO> findAll(Pageable pageable) {
-        return appointmentRepository.findAll(pageable).map(this::toResponse); }
-
-    @Cacheable(value = "appointmentById", key = "#id")
-    public AppointmentResponseDTO findById(Integer id) {
-        return toResponse(findEntityById(id)); }
+    public AppointmentResponseDTO findByIdForGuardian(Integer id, Integer guardianId) {
+        return toResponse(findOwnedEntity(id, guardianId)); }
 
     @CacheEvict(value = {"appointments", "appointmentById"}, allEntries = true)
-    public AppointmentResponseDTO create(AppointmentRequestDTO dto) {
+    public AppointmentResponseDTO create(Integer guardianId, AppointmentRequestDTO dto) {
         Appointment appointment = new Appointment();
-        appointment.setDate(dto.getDate());
-        appointment.setTime(dto.getTime());
-        appointment.setStatus(dto.getStatus());
-        appointment.setAnimal(resolveAnimal(dto.getAnimalId()));
-        appointment.setClinic(resolveClinic(dto.getClinicId()));
-        appointment.setVeterinarian(resolveVeterinarian(dto.getVeterinarianId()));
-        Appointment saved = appointmentRepository.save(appointment);
+        appointment.setStatus(STATUS_SCHEDULED);
+        Appointment saved = appointmentRepository.save(copyFields(appointment, guardianId, dto));
 
         History history = new History();
         history.setDescription("Appointment was scheduled");
@@ -57,29 +46,31 @@ public class AppointmentService {
     }
 
     @CacheEvict(value = {"appointments", "appointmentById"}, allEntries = true)
-    public AppointmentResponseDTO update(Integer id, AppointmentRequestDTO dto) {
-        Appointment appointment = findEntityById(id);
-        appointment.setDate(dto.getDate());
-        appointment.setTime(dto.getTime());
-        appointment.setStatus(dto.getStatus());
-        appointment.setAnimal(resolveAnimal(dto.getAnimalId()));
-        appointment.setClinic(resolveClinic(dto.getClinicId()));
-        appointment.setVeterinarian(resolveVeterinarian(dto.getVeterinarianId()));
-        return toResponse(appointmentRepository.save(appointment));
-    }
-
-    @CacheEvict(value = {"appointments", "appointmentById"}, allEntries = true)
-    public void deleteById(Integer id) {
-        if (!appointmentRepository.existsById(id)) throw notFound("Appointment");
-        appointmentRepository.deleteById(id);
+    public AppointmentResponseDTO update(Integer id, Integer guardianId, AppointmentRequestDTO dto) {
+        Appointment appointment = findOwnedEntity(id, guardianId);
+        if (!STATUS_SCHEDULED.equals(appointment.getStatus())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Only scheduled appointments can be changed");
+        }
+        return toResponse(appointmentRepository.save(copyFields(appointment, guardianId, dto)));
     }
 
     public Appointment findEntityById(Integer id) {
         return appointmentRepository.findById(id).orElseThrow(() -> notFound("Appointment"));
     }
 
-    private Animal resolveAnimal(Integer animalId) {
-        return animalRepository.findById(animalId).orElseThrow(() -> notFound("Animal"));
+    private Appointment findOwnedEntity(Integer id, Integer guardianId) {
+        Appointment appointment = findEntityById(id);
+        if (!appointment.getAnimal().getGuardian().getId().equals(guardianId)) throw forbidden();
+        return appointment;
+    }
+
+    private Appointment copyFields(Appointment appointment, Integer guardianId, AppointmentRequestDTO dto) {
+        appointment.setDate(dto.getDate());
+        appointment.setTime(dto.getTime());
+        appointment.setAnimal(animalService.findOwnedEntity(dto.getAnimalId(), guardianId));
+        appointment.setClinic(resolveClinic(dto.getClinicId()));
+        appointment.setVeterinarian(resolveVeterinarian(dto.getVeterinarianId()));
+        return appointment;
     }
 
     private Clinic resolveClinic(Integer clinicId) {
@@ -144,8 +135,7 @@ public class AppointmentService {
 
     @CacheEvict(value = {"appointments", "appointmentById"}, allEntries = true)
     public AppointmentResponseDTO cancelByGuardian(Integer id, Integer guardianId, String reason) {
-        Appointment appointment = findEntityById(id);
-        if (!appointment.getAnimal().getGuardian().getId().equals(guardianId)) throw forbidden();
+        Appointment appointment = findOwnedEntity(id, guardianId);
         appointment.setStatus(STATUS_CANCELED);
         appointment.setCancelReason(reason);
         return toResponse(appointmentRepository.save(appointment));
