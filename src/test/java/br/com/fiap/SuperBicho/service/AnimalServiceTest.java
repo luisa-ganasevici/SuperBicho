@@ -12,6 +12,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.Optional;
@@ -52,7 +53,7 @@ public class AnimalServiceTest {
         animal.setWeight(12.5);
         animal.setGuardian(guardian);
 
-        animalRequestDTO = new AnimalRequestDTO("Rex", "Cachorro", 3, 12.5, 1);
+        animalRequestDTO = new AnimalRequestDTO("Rex", "Cachorro", 3, 12.5);
     }
 
     @Test
@@ -62,7 +63,7 @@ public class AnimalServiceTest {
         when(animalRepository.save(any(Animal.class))).thenReturn(animal);
 
         // act
-        AnimalResponseDTO response = animalService.create(animalRequestDTO);
+        AnimalResponseDTO response = animalService.create(1, animalRequestDTO);
 
         // assert
         assertEquals("Rex", response.getName());
@@ -80,22 +81,33 @@ public class AnimalServiceTest {
 
         // act + assert
         ResponseStatusException exception = assertThrows(ResponseStatusException.class,
-                () -> animalService.create(animalRequestDTO));
+                () -> animalService.create(1, animalRequestDTO));
         assertTrue(exception.getReason().contains("Guardian"));
         verify(animalRepository, never()).save(any(Animal.class));
     }
 
     @Test
-    public void deveBuscarAnimalPorIdComSucesso() {
+    public void deveBuscarAnimalDoProprioTutor() {
         // arrange
         when(animalRepository.findById(1)).thenReturn(Optional.of(animal));
 
         // act
-        AnimalResponseDTO response = animalService.findById(1);
+        AnimalResponseDTO response = animalService.findByIdForGuardian(1, 1);
 
         // assert
         assertEquals(1, response.getId());
         assertEquals("Rex", response.getName());
+    }
+
+    @Test
+    public void deveImpedirBuscarAnimalDeOutroTutor() {
+        // arrange
+        when(animalRepository.findById(1)).thenReturn(Optional.of(animal));
+
+        // act + assert
+        ResponseStatusException exception = assertThrows(ResponseStatusException.class,
+                () -> animalService.findByIdForGuardian(1, 99));
+        assertEquals(HttpStatus.FORBIDDEN, exception.getStatusCode());
     }
 
     @Test
@@ -104,28 +116,42 @@ public class AnimalServiceTest {
         when(animalRepository.findById(99)).thenReturn(Optional.empty());
 
         // act + assert
-        assertThrows(ResponseStatusException.class, () -> animalService.findById(99));
+        assertThrows(ResponseStatusException.class, () -> animalService.findByIdForGuardian(99, 1));
     }
 
     @Test
-    public void deveExcluirAnimalComSucesso() {
+    public void deveImpedirEditarAnimalDeOutroTutor() {
         // arrange
-        when(animalRepository.existsById(1)).thenReturn(true);
-
-        // act
-        animalService.deleteById(1);
-
-        // assert
-        verify(animalRepository, times(1)).deleteById(1);
-    }
-
-    @Test
-    public void deveLancarExcecaoAoExcluirAnimalInexistente() {
-        // arrange
-        when(animalRepository.existsById(99)).thenReturn(false);
+        when(animalRepository.findById(1)).thenReturn(Optional.of(animal));
 
         // act + assert
-        assertThrows(ResponseStatusException.class, () -> animalService.deleteById(99));
-        verify(animalRepository, never()).deleteById(any());
+        ResponseStatusException exception = assertThrows(ResponseStatusException.class,
+                () -> animalService.update(1, 99, animalRequestDTO));
+        assertEquals(HttpStatus.FORBIDDEN, exception.getStatusCode());
+        verify(animalRepository, never()).save(any(Animal.class));
+    }
+
+    @Test
+    public void deveExcluirAnimalDoProprioTutor() {
+        // arrange
+        when(animalRepository.findById(1)).thenReturn(Optional.of(animal));
+
+        // act
+        animalService.deleteById(1, 1);
+
+        // assert
+        verify(animalRepository, times(1)).delete(animal);
+    }
+
+    @Test
+    public void deveImpedirExcluirAnimalDeOutroTutor() {
+        // arrange
+        when(animalRepository.findById(1)).thenReturn(Optional.of(animal));
+
+        // act + assert
+        ResponseStatusException exception = assertThrows(ResponseStatusException.class,
+                () -> animalService.deleteById(1, 99));
+        assertEquals(HttpStatus.FORBIDDEN, exception.getStatusCode());
+        verify(animalRepository, never()).delete(any(Animal.class));
     }
 }

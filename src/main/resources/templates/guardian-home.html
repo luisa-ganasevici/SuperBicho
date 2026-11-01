@@ -155,7 +155,7 @@
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json', [csrfHeader]: csrfToken },
                 body: JSON.stringify({
-                    date: novaData, time: novoHorario, status: 'AGENDADO',
+                    date: novaData, time: novoHorario,
                     animalId: animalId, clinicId: clinicId, veterinarianId: veterinarianId
                 })
             })
