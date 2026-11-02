@@ -69,7 +69,7 @@ public class CheckUpServiceTest {
         checkUpRequestDTO.setAnimalId(1);
         checkUpRequestDTO.setClinicId(1);
 
-        checkUp = new CheckUp(1, "Raio-X", "2026-10-10", "PENDENTE", null, animal, clinic);
+        checkUp = new CheckUp(1, "Raio-X", "2026-10-10", "PENDENTE", null, animal, clinic, "Rex", "Maria Silva");
     }
 
     @Test
@@ -128,7 +128,7 @@ public class CheckUpServiceTest {
     @Test
     public void deveLancarExcecaoAoConcluirExameSemClinicaVinculada() {
         // arrange: exame criado sem clínica (campo opcional na entidade)
-        CheckUp exameSemClinica = new CheckUp(2, "Raio-X", "2026-10-10", "PENDENTE", null, animal, null);
+        CheckUp exameSemClinica = new CheckUp(2, "Raio-X", "2026-10-10", "PENDENTE", null, animal, null, "Rex", "Maria Silva");
         when(checkUpRepository.findById(2)).thenReturn(Optional.of(exameSemClinica));
 
         // act + assert
@@ -149,10 +149,36 @@ public class CheckUpServiceTest {
     }
 
     @Test
+    public void deveCancelarExamesPendentesDoPet() {
+        // act
+        checkUpService.cancelOpenByAnimal(1, "Pet removido pelo tutor");
+
+        // assert
+        verify(checkUpRepository, times(1))
+                .updateStatusByAnimal(1, "PENDENTE", "CANCELADO", "Pet removido pelo tutor");
+    }
+
+    @Test
+    public void deveManterNomesNoExameDePetExcluido() {
+        // arrange
+        CheckUp semPet = new CheckUp(3, "Raio-X", "2026-10-10", "CANCELADO", "Pet removido pelo tutor",
+                null, clinic, "Rex", "Maria Silva");
+        when(checkUpRepository.findByClinicId(1)).thenReturn(List.of(semPet));
+
+        // act
+        CheckUpResponseDTO response = checkUpService.findByClinic(1).get(0);
+
+        // assert
+        assertNull(response.getAnimalId());
+        assertEquals("Rex", response.getAnimalName());
+        assertEquals("Maria Silva", response.getGuardianName());
+    }
+
+    @Test
     public void deveCancelarApenasExamesPendentesAoCancelarTodosDaClinica() {
         // arrange
-        CheckUp pendente = new CheckUp(1, "Raio-X", "2026-10-10", "PENDENTE", null, animal, clinic);
-        CheckUp concluido = new CheckUp(2, "Ultrassom", "2026-08-01", "CONCLUIDO", null, animal, clinic);
+        CheckUp pendente = new CheckUp(1, "Raio-X", "2026-10-10", "PENDENTE", null, animal, clinic, "Rex", "Maria Silva");
+        CheckUp concluido = new CheckUp(2, "Ultrassom", "2026-08-01", "CONCLUIDO", null, animal, clinic, "Rex", "Maria Silva");
         when(checkUpRepository.findByClinicId(1)).thenReturn(List.of(pendente, concluido));
 
         // act

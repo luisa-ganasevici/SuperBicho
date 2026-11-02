@@ -35,10 +35,6 @@ public class AnimalService {
     public AnimalResponseDTO update(Integer id, Integer guardianId, AnimalRequestDTO dto) {
         return toResponse(animalRepository.save(copyFields(findOwnedEntity(id, guardianId), dto))); }
 
-    @CacheEvict(value = "animalsByGuardian", allEntries = true)
-    public void deleteById(Integer id, Integer guardianId) {
-        animalRepository.delete(findOwnedEntity(id, guardianId)); }
-
     public Animal findOwnedEntity(Integer id, Integer guardianId) {
         Animal animal = animalRepository.findById(id).orElseThrow(() -> notFound("Animal"));
         if (!animal.getGuardian().getId().equals(guardianId)) {

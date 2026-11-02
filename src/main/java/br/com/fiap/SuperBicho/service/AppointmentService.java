@@ -2,13 +2,13 @@ package br.com.fiap.SuperBicho.service;
 
 import br.com.fiap.SuperBicho.dto.request.AppointmentRequestDTO;
 import br.com.fiap.SuperBicho.dto.response.AppointmentResponseDTO;
-import br.com.fiap.SuperBicho.dto.response.CheckUpResponseDTO;
 import br.com.fiap.SuperBicho.entity.*;
 import br.com.fiap.SuperBicho.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
@@ -60,14 +60,18 @@ public class AppointmentService {
 
     private Appointment findOwnedEntity(Integer id, Integer guardianId) {
         Appointment appointment = findEntityById(id);
-        if (!appointment.getAnimal().getGuardian().getId().equals(guardianId)) throw forbidden();
+        Animal animal = appointment.getAnimal();
+        if (animal == null || !animal.getGuardian().getId().equals(guardianId)) throw forbidden();
         return appointment;
     }
 
     private Appointment copyFields(Appointment appointment, Integer guardianId, AppointmentRequestDTO dto) {
         appointment.setDate(dto.getDate());
         appointment.setTime(dto.getTime());
-        appointment.setAnimal(animalService.findOwnedEntity(dto.getAnimalId(), guardianId));
+        Animal animal = animalService.findOwnedEntity(dto.getAnimalId(), guardianId);
+        appointment.setAnimal(animal);
+        appointment.setAnimalName(animal.getName());
+        appointment.setGuardianName(animal.getGuardian().getName());
         appointment.setClinic(resolveClinic(dto.getClinicId()));
         appointment.setVeterinarian(resolveVeterinarian(dto.getVeterinarianId()));
         return appointment;
@@ -83,28 +87,15 @@ public class AppointmentService {
     }
 
     private AppointmentResponseDTO toResponse(Appointment appointment) {
+        Animal animal = appointment.getAnimal();
         return new AppointmentResponseDTO(appointment.getId(), appointment.getDate(), appointment.getTime(),
                 appointment.getStatus(), appointment.getCancelReason(),
-                appointment.getAnimal().getId(), appointment.getAnimal().getName(),
+                animal != null ? animal.getId() : null,
+                animal != null ? animal.getName() : appointment.getAnimalName(),
                 appointment.getClinic().getId(), appointment.getClinic().getName(),
                 appointment.getVeterinarian() != null ? appointment.getVeterinarian().getId() : null,
                 appointment.getVeterinarian() != null ? appointment.getVeterinarian().getName() : null,
-                appointment.getAnimal().getGuardian().getName());
-    }
-
-    private CheckUpResponseDTO toResponse(CheckUp checkUp) {
-        return new CheckUpResponseDTO(
-                checkUp.getId(),
-                checkUp.getCheckUpType(),
-                checkUp.getCheckUpDate(),
-                checkUp.getStatus(),
-                checkUp.getCancelReason(),
-                checkUp.getAnimal().getId(),
-                checkUp.getAnimal().getName(),
-                checkUp.getClinic() != null ? checkUp.getClinic().getId() : null,
-                checkUp.getClinic() != null ? checkUp.getClinic().getName() : null,
-                checkUp.getAnimal().getGuardian().getName()
-        );
+                animal != null ? animal.getGuardian().getName() : appointment.getGuardianName());
     }
 
     private ResponseStatusException notFound(String resource) {
@@ -156,6 +147,11 @@ public class AppointmentService {
         if (!appointment.getClinic().getId().equals(clinicId)) throw forbidden();
         appointment.setStatus(STATUS_COMPLETED);
         return toResponse(appointmentRepository.save(appointment));
+    }
+
+    @Transactional
+    public void cancelOpenByAnimal(Integer animalId, String reason) {
+        appointmentRepository.updateStatusByAnimal(animalId, STATUS_SCHEDULED, STATUS_CANCELED, reason);
     }
 
     @CacheEvict(value = {"appointments", "appointmentById"}, allEntries = true)
