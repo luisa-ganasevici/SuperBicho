@@ -164,7 +164,7 @@
         }
 
         function excluirAnimal(id) {
-            if (!confirm('Excluir este pet? Essa ação não pode ser desfeita.')) return;
+            if (!confirm('Excluir este pet? As consultas e exames em aberto serão cancelados. Essa ação não pode ser desfeita.')) return;
 
             const csrfToken = document.querySelector('meta[name="_csrf"]').content;
             const csrfHeader = document.querySelector('meta[name="_csrf_header"]').content;
@@ -173,7 +173,7 @@
                 method: 'DELETE',
                 headers: { [csrfHeader]: csrfToken }
             })
-            .then(res => { if (!res.ok) throw new Error('Erro ao excluir (talvez tenha consulta/exame vinculado)'); location.reload(); })
+            .then(res => { if (!res.ok) throw new Error('Erro ao excluir o pet (' + res.status + ')'); location.reload(); })
             .catch(err => alert(err.message));
         }
     </script>

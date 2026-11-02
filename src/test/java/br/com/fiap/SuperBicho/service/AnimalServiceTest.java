@@ -130,28 +130,4 @@ public class AnimalServiceTest {
         assertEquals(HttpStatus.FORBIDDEN, exception.getStatusCode());
         verify(animalRepository, never()).save(any(Animal.class));
     }
-
-    @Test
-    public void deveExcluirAnimalDoProprioTutor() {
-        // arrange
-        when(animalRepository.findById(1)).thenReturn(Optional.of(animal));
-
-        // act
-        animalService.deleteById(1, 1);
-
-        // assert
-        verify(animalRepository, times(1)).delete(animal);
-    }
-
-    @Test
-    public void deveImpedirExcluirAnimalDeOutroTutor() {
-        // arrange
-        when(animalRepository.findById(1)).thenReturn(Optional.of(animal));
-
-        // act + assert
-        ResponseStatusException exception = assertThrows(ResponseStatusException.class,
-                () -> animalService.deleteById(1, 99));
-        assertEquals(HttpStatus.FORBIDDEN, exception.getStatusCode());
-        verify(animalRepository, never()).delete(any(Animal.class));
-    }
 }

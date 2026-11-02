@@ -39,4 +39,10 @@ public class Appointment {
     @ManyToOne
     @JoinColumn(name = "veterinarian_id")
     private Veterinarian veterinarian;
+
+    @Column(name = "animal_name")
+    private String animalName;
+
+    @Column(name = "guardian_name")
+    private String guardianName;
 }

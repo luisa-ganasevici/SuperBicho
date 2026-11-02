@@ -9,6 +9,7 @@ import org.springframework.cache.annotation.*;
 import org.springframework.data.domain.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
@@ -40,7 +41,7 @@ public class CheckUpService {
         checkUp.setCheckUpType(dto.getCheckUpType());
         checkUp.setCheckUpDate(dto.getCheckUpDate());
         checkUp.setStatus(dto.getStatus());
-        checkUp.setAnimal(resolveAnimal(dto.getAnimalId()));
+        assignAnimal(checkUp, dto.getAnimalId());
         checkUp.setClinic(resolveClinic(dto.getClinicId()));
         CheckUp saved = checkUpRepository.save(checkUp);
 
@@ -60,7 +61,7 @@ public class CheckUpService {
         checkUp.setCheckUpType(dto.getCheckUpType());
         checkUp.setCheckUpDate(dto.getCheckUpDate());
         checkUp.setStatus(dto.getStatus());
-        checkUp.setAnimal(resolveAnimal(dto.getAnimalId()));
+        assignAnimal(checkUp, dto.getAnimalId());
         checkUp.setClinic(resolveClinic(dto.getClinicId()));
         return toResponse(checkUpRepository.save(checkUp));
     }
@@ -75,8 +76,11 @@ public class CheckUpService {
         return checkUpRepository.findById(id).orElseThrow(() -> notFound("Check-up"));
     }
 
-    private Animal resolveAnimal(Integer animalId) {
-        return animalRepository.findById(animalId).orElseThrow(() -> notFound("Animal"));
+    private void assignAnimal(CheckUp checkUp, Integer animalId) {
+        Animal animal = animalRepository.findById(animalId).orElseThrow(() -> notFound("Animal"));
+        checkUp.setAnimal(animal);
+        checkUp.setAnimalName(animal.getName());
+        checkUp.setGuardianName(animal.getGuardian().getName());
     }
 
     private Clinic resolveClinic(Integer clinicId) {
@@ -86,17 +90,18 @@ public class CheckUpService {
 
 
     private CheckUpResponseDTO toResponse(CheckUp checkUp) {
+        Animal animal = checkUp.getAnimal();
         return new CheckUpResponseDTO(
                 checkUp.getId(),
                 checkUp.getCheckUpType(),
                 checkUp.getCheckUpDate(),
                 checkUp.getStatus(),
                 checkUp.getCancelReason(),
-                checkUp.getAnimal().getId(),
-                checkUp.getAnimal().getName(),
+                animal != null ? animal.getId() : null,
+                animal != null ? animal.getName() : checkUp.getAnimalName(),
                 checkUp.getClinic() != null ? checkUp.getClinic().getId() : null,
                 checkUp.getClinic() != null ? checkUp.getClinic().getName() : null,
-                checkUp.getAnimal().getGuardian().getName()
+                animal != null ? animal.getGuardian().getName() : checkUp.getGuardianName()
         );
     }
 
@@ -129,7 +134,8 @@ public class CheckUpService {
     @CacheEvict(value = {"checkUps", "checkUpById"}, allEntries = true)
     public CheckUpResponseDTO cancelByGuardian(Integer id, Integer guardianId, String reason) {
         CheckUp checkUp = findEntityById(id);
-        if (!checkUp.getAnimal().getGuardian().getId().equals(guardianId)) throw forbidden();
+        Animal animal = checkUp.getAnimal();
+        if (animal == null || !animal.getGuardian().getId().equals(guardianId)) throw forbidden();
         checkUp.setStatus(STATUS_CANCELED);
         checkUp.setCancelReason(reason);
         return toResponse(checkUpRepository.save(checkUp));
@@ -161,6 +167,11 @@ public class CheckUpService {
         checkUp.setCancelReason(reason);
 
         return toResponse(checkUpRepository.save(checkUp));
+    }
+
+    @Transactional
+    public void cancelOpenByAnimal(Integer animalId, String reason) {
+        checkUpRepository.updateStatusByAnimal(animalId, STATUS_PENDING, STATUS_CANCELED, reason);
     }
 
     @CacheEvict(value = {"checkUps", "checkUpById"}, allEntries = true)

@@ -65,7 +65,7 @@ public class AppointmentServiceTest {
 
         appointmentRequestDTO = new AppointmentRequestDTO("2026-10-10", "14:00", 1, 1, null);
 
-        appointment = new Appointment(1, "2026-10-10", "14:00", "AGENDADO", null, animal, clinic, null);
+        appointment = new Appointment(1, "2026-10-10", "14:00", "AGENDADO", null, animal, clinic, null, "Rex", "Maria Silva");
     }
 
     @Test
@@ -191,10 +191,48 @@ public class AppointmentServiceTest {
     }
 
     @Test
+    public void deveCancelarConsultasEmAbertoDoPet() {
+        // act
+        appointmentService.cancelOpenByAnimal(1, "Pet removido pelo tutor");
+
+        // assert
+        verify(appointmentRepository, times(1))
+                .updateStatusByAnimal(1, "AGENDADO", "CANCELADO", "Pet removido pelo tutor");
+    }
+
+    @Test
+    public void deveManterNomesNaConsultaDePetExcluido() {
+        // arrange
+        Appointment semPet = new Appointment(3, "2026-10-10", "14:00", "CANCELADO", "Pet removido pelo tutor",
+                null, clinic, null, "Rex", "Maria Silva");
+        when(appointmentRepository.findByClinicId(1)).thenReturn(List.of(semPet));
+
+        // act
+        AppointmentResponseDTO response = appointmentService.findByClinic(1).get(0);
+
+        // assert
+        assertNull(response.getAnimalId());
+        assertEquals("Rex", response.getAnimalName());
+        assertEquals("Maria Silva", response.getGuardianName());
+    }
+
+    @Test
+    public void deveImpedirTutorDeAcessarConsultaDePetExcluido() {
+        // arrange
+        appointment.setAnimal(null);
+        when(appointmentRepository.findById(1)).thenReturn(Optional.of(appointment));
+
+        // act + assert
+        ResponseStatusException exception = assertThrows(ResponseStatusException.class,
+                () -> appointmentService.findByIdForGuardian(1, 1));
+        assertEquals(HttpStatus.FORBIDDEN, exception.getStatusCode());
+    }
+
+    @Test
     public void deveCancelarApenasConsultasAgendadasAoCancelarTodasDaClinica() {
         // arrange
-        Appointment agendada = new Appointment(1, "2026-10-10", "14:00", "AGENDADO", null, animal, clinic, null);
-        Appointment concluida = new Appointment(2, "2026-09-01", "09:00", "CONCLUIDO", null, animal, clinic, null);
+        Appointment agendada = new Appointment(1, "2026-10-10", "14:00", "AGENDADO", null, animal, clinic, null, "Rex", "Maria Silva");
+        Appointment concluida = new Appointment(2, "2026-09-01", "09:00", "CONCLUIDO", null, animal, clinic, null, "Rex", "Maria Silva");
         when(appointmentRepository.findByClinicId(1)).thenReturn(List.of(agendada, concluida));
 
         // act
