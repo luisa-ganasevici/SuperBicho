@@ -5,7 +5,7 @@ Plataforma web que conecta **tutores de pets**, **clínicas veterinárias** e um
 | | |
 |---|---|
 | **Aplicação online** | https://superbicho.onrender.com |
-| **Vídeo da apresentação (entrega final)** | _adicionar link_ |
+| **Vídeo da apresentação (entrega final)** | https://youtu.be/KjyKQ0R6Rs8 |
 | **Vídeo da entrega anterior** | https://youtu.be/7f1usMVVaGY |
 | **Repositório** | https://github.com/luisa-ganasevici/SuperBicho |
 
@@ -182,14 +182,14 @@ As migrations em `src/main/resources/db/migration` são aplicadas automaticament
 
 ## 🎓 Integração multidisciplinar
 
-> _Preencher com as disciplinas do semestre e as evidências de cada uma._
+📄 Documento completo: [`docs/integracao-multidisciplinar.pdf`](docs/integracao-multidisciplinar.pdf)
 
 | Disciplina | Como foi aplicada no SuperBicho | Evidência |
 |---|---|---|
-| Java Advanced | Aplicação Spring Boot completa: MVC + Thymeleaf, Spring Security com três perfis, Flyway, cache, validações, API REST e testes unitários | Este repositório |
-| _Banco de dados_ | _Modelagem e scripts Oracle_ | _`src/main/resources/db/migration`, DER_ |
-| _Mobile_ | _App consumindo a API REST do SuperBicho_ | _link do repositório mobile_ |
-| _…_ | _…_ | _canvas, protótipo, documentação_ |
+| Mastering Relational and Non-Relational Database | Modelagem relacional em Oracle (12 tabelas, PK, FK, UNIQUE, regras `ON DELETE`) versionada em 11 migrations Flyway | [`db/migration`](src/main/resources/db/migration) · DER no PDF |
+| DevOps Tools & Cloud Computing | Dockerfile multi-stage, deploy no Render, credenciais por variáveis de ambiente, fluxo de branches com Pull Requests | [`Dockerfile`](Dockerfile) · [aplicação online](https://superbicho.onrender.com) |
+| Compliance, Quality Assurance & Tests | 62 testes automatizados (JUnit 5 + Mockito), testes de segurança da API no Postman, BCrypt, CSRF e acesso restrito ao dono dos dados | [`src/test`](src/test) · [`docs/SuperBicho.postman_collection.json`](docs/SuperBicho.postman_collection.json) |
+| Java Advanced | Aplicação Spring Boot completa: MVC + Thymeleaf, Spring Security com três perfis, Flyway, JPA, cache, validações e API REST | Este repositório |
 
 ---
 
