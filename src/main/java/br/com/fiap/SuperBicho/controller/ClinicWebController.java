@@ -78,7 +78,7 @@ public class ClinicWebController {
         model.addAttribute("appointments", appointments);
         model.addAttribute("checkUps", checkUps);
 
-        String today = LocalDate.now().toString(); // formato yyyy-MM-dd, igual ao <input type="date">
+        String today = LocalDate.now().toString();
         model.addAttribute("todayAppointments", appointments.stream()
                 .filter(a -> today.equals(a.getDate()) && AppointmentService.STATUS_SCHEDULED.equals(a.getStatus()))
                 .toList());
