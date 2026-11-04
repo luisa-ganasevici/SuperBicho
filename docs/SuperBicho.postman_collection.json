@@ -1,0 +1,1544 @@
+{
+  "info": {
+    "_postman_id": "54a7926e-4a69-48f6-8c65-f3465504c698",
+    "name": "SuperBicho - Teste de segurança (dono do recurso)",
+    "description": "Rode na ordem (Run collection). CSRF, ids e clínica são capturados automaticamente. Ajuste e-mails/senhas dos tutores em Variables. Pré-requisitos: app rodando e pelo menos 1 clínica APPROVED.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "49809627",
+    "_collection_link": "https://go.postman.co/collection/49809627-54a7926e-4a69-48f6-8c65-f3465504c698?source=collection_link"
+  },
+  "item": [
+    {
+      "name": "00 - Cadastro dos tutores (opcional)",
+      "item": [
+        {
+          "name": "GET /cadastro (pega CSRF)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 200\", () => pm.response.to.have.status(200));",
+                  "const m = pm.response.text().match(/name=\"_csrf\"[^>]*?(?:value|content)=\"([^\"]+)\"/);",
+                  "pm.test(\"CSRF capturado\", () => pm.expect(m, \"token _csrf não encontrado no HTML\").to.not.be.null);",
+                  "if (m) pm.collectionVariables.set(\"csrf\", m[1]);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/cadastro",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "cadastro"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "POST /cadastro (Tutor A)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Cadastro enviado\", () => pm.expect(pm.response.code).to.be.oneOf([200,302]));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                {
+                  "key": "name",
+                  "value": "Tutor A",
+                  "type": "text"
+                },
+                {
+                  "key": "email",
+                  "value": "{{tutorAEmail}}",
+                  "type": "text"
+                },
+                {
+                  "key": "password",
+                  "value": "{{tutorAPassword}}",
+                  "type": "text"
+                },
+                {
+                  "key": "_csrf",
+                  "value": "{{csrf}}",
+                  "type": "text"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/cadastro",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "cadastro"
+              ]
+            },
+            "description": "Se o e-mail já existir, pule este passo."
+          },
+          "response": []
+        },
+        {
+          "name": "GET /cadastro (pega CSRF)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 200\", () => pm.response.to.have.status(200));",
+                  "const m = pm.response.text().match(/name=\"_csrf\"[^>]*?(?:value|content)=\"([^\"]+)\"/);",
+                  "pm.test(\"CSRF capturado\", () => pm.expect(m, \"token _csrf não encontrado no HTML\").to.not.be.null);",
+                  "if (m) pm.collectionVariables.set(\"csrf\", m[1]);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/cadastro",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "cadastro"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "POST /cadastro (Tutor B)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Cadastro enviado\", () => pm.expect(pm.response.code).to.be.oneOf([200,302]));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                {
+                  "key": "name",
+                  "value": "Tutor B",
+                  "type": "text"
+                },
+                {
+                  "key": "email",
+                  "value": "{{tutorBEmail}}",
+                  "type": "text"
+                },
+                {
+                  "key": "password",
+                  "value": "{{tutorBPassword}}",
+                  "type": "text"
+                },
+                {
+                  "key": "_csrf",
+                  "value": "{{csrf}}",
+                  "type": "text"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/cadastro",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "cadastro"
+              ]
+            },
+            "description": "Se o e-mail já existir, pule este passo."
+          },
+          "response": []
+        }
+      ],
+      "description": "Rode só se os tutores A e B ainda não existirem."
+    },
+    {
+      "name": "01 - Login Tutor A",
+      "item": [
+        {
+          "name": "GET /login (pega CSRF)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 200\", () => pm.response.to.have.status(200));",
+                  "const m = pm.response.text().match(/name=\"_csrf\"[^>]*?(?:value|content)=\"([^\"]+)\"/);",
+                  "pm.test(\"CSRF capturado\", () => pm.expect(m, \"token _csrf não encontrado no HTML\").to.not.be.null);",
+                  "if (m) pm.collectionVariables.set(\"csrf\", m[1]);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "login"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "POST /login (Tutor A)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Login OK (caiu na home do tutor)\", () => pm.expect(pm.response.text()).to.include(\"Meus pets\"));",
+                  "const m = pm.response.text().match(/name=\"_csrf\"[^>]*?(?:value|content)=\"([^\"]+)\"/);",
+                  "pm.test(\"CSRF capturado\", () => pm.expect(m, \"token _csrf não encontrado no HTML\").to.not.be.null);",
+                  "if (m) pm.collectionVariables.set(\"csrf\", m[1]);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                {
+                  "key": "username",
+                  "value": "{{tutorAEmail}}",
+                  "type": "text"
+                },
+                {
+                  "key": "password",
+                  "value": "{{tutorAPassword}}",
+                  "type": "text"
+                },
+                {
+                  "key": "_csrf",
+                  "value": "{{csrf}}",
+                  "type": "text"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "login"
+              ]
+            },
+            "description": "Segue o redirect para /guardian/home e já captura o novo CSRF (ele muda depois do login)."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "02 - Tutor A - Animais (deve funcionar)",
+      "item": [
+        {
+          "name": "GET /animals (só pets do A)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 200\", () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/animals",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "animals"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "POST /animals (cria pet do A)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 201\", () => pm.response.to.have.status(201));",
+                  "const j = pm.response.json();",
+                  "pm.collectionVariables.set(\"petA\", j.id);",
+                  "pm.collectionVariables.set(\"tutorAId\", j.guardianId);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "X-CSRF-TOKEN",
+                "value": "{{csrf}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Rex\",\n  \"species\": \"Cachorro\",\n  \"age\": 3,\n  \"weight\": 12.5\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/animals",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "animals"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "GET /animals/{{petA}}",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 200\", () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/animals/{{petA}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "animals",
+                "{{petA}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "PUT /animals/{{petA}}",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Nome alterado\", () => pm.expect(pm.response.json().name).to.eql(\"Rex Editado\"));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "X-CSRF-TOKEN",
+                "value": "{{csrf}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Rex Editado\",\n  \"species\": \"Cachorro\",\n  \"age\": 3,\n  \"weight\": 12.5\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/animals/{{petA}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "animals",
+                "{{petA}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "POST /animals (pet temporário)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 201\", () => pm.response.to.have.status(201));",
+                  "pm.collectionVariables.set(\"petTemp\", pm.response.json().id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "X-CSRF-TOKEN",
+                "value": "{{csrf}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Temporario\",\n  \"species\": \"Cachorro\",\n  \"age\": 3,\n  \"weight\": 12.5\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/animals",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "animals"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "DELETE /animals/{{petTemp}} (pet sem consulta)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 204\", () => pm.response.to.have.status(204));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "X-CSRF-TOKEN",
+                "value": "{{csrf}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/animals/{{petTemp}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "animals",
+                "{{petTemp}}"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "03 - Tutor A - Agendamentos (deve funcionar)",
+      "item": [
+        {
+          "name": "GET /clinics (pega 1 clínica aprovada)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 200\", () => pm.response.to.have.status(200));",
+                  "const j = pm.response.json();",
+                  "const lista = j.content || j;",
+                  "const c = lista.find(x => x.clinicStatus === \"APPROVED\");",
+                  "pm.test(\"Existe clínica APPROVED\", () => pm.expect(c, \"aprove uma clínica pelo ADM antes\").to.exist);",
+                  "if (c) pm.collectionVariables.set(\"clinicId\", c.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/clinics",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "clinics"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "GET /appointments (só do A)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 200\", () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/appointments",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "appointments"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "POST /appointments (consulta do A)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 201\", () => pm.response.to.have.status(201));",
+                  "pm.collectionVariables.set(\"apptA\", pm.response.json().id);",
+                  "pm.test(\"Status nasce AGENDADO\", () => pm.expect(pm.response.json().status).to.eql(\"AGENDADO\"));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "X-CSRF-TOKEN",
+                "value": "{{csrf}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"date\": \"2026-12-10\",\n  \"time\": \"10:00\",\n  \"animalId\": {{petA}},\n  \"clinicId\": {{clinicId}}\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/appointments",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "appointments"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "GET /appointments/{{apptA}}",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 200\", () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/appointments/{{apptA}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "appointments",
+                "{{apptA}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "PUT /appointments/{{apptA}} (remarcar)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Data alterada\", () => pm.expect(pm.response.json().date).to.eql(\"2026-12-15\"));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "X-CSRF-TOKEN",
+                "value": "{{csrf}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"date\": \"2026-12-15\",\n  \"time\": \"14:30\",\n  \"animalId\": {{petA}},\n  \"clinicId\": {{clinicId}}\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/appointments/{{apptA}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "appointments",
+                "{{apptA}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "POST /appointments (consulta extra p/ cancelar)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 201\", () => pm.response.to.have.status(201));",
+                  "pm.collectionVariables.set(\"apptExtra\", pm.response.json().id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "X-CSRF-TOKEN",
+                "value": "{{csrf}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"date\": \"2026-12-10\",\n  \"time\": \"10:00\",\n  \"animalId\": {{petA}},\n  \"clinicId\": {{clinicId}}\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/appointments",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "appointments"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "PATCH /appointments/{{apptExtra}}/cancel",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Cancelada\", () => pm.expect(pm.response.json().status).to.eql(\"CANCELADO\"));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "X-CSRF-TOKEN",
+                "value": "{{csrf}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"reason\": \"Imprevisto\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/appointments/{{apptExtra}}/cancel",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "appointments",
+                "{{apptExtra}}",
+                "cancel"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "PUT /appointments/{{apptExtra}} (cancelada não muda)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 400\", () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "X-CSRF-TOKEN",
+                "value": "{{csrf}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"date\": \"2026-12-10\",\n  \"time\": \"10:00\",\n  \"animalId\": {{petA}},\n  \"clinicId\": {{clinicId}}\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/appointments/{{apptExtra}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "appointments",
+                "{{apptExtra}}"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "04 - Logout Tutor A",
+      "item": [
+        {
+          "name": "POST /logout",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Deslogado\", () => pm.expect(pm.response.code).to.be.oneOf([200,302]));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "X-CSRF-TOKEN",
+                "value": "{{csrf}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/logout",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "logout"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "05 - Login Tutor B",
+      "item": [
+        {
+          "name": "GET /login (pega CSRF)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 200\", () => pm.response.to.have.status(200));",
+                  "const m = pm.response.text().match(/name=\"_csrf\"[^>]*?(?:value|content)=\"([^\"]+)\"/);",
+                  "pm.test(\"CSRF capturado\", () => pm.expect(m, \"token _csrf não encontrado no HTML\").to.not.be.null);",
+                  "if (m) pm.collectionVariables.set(\"csrf\", m[1]);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "login"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "POST /login (Tutor B)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Login OK (caiu na home do tutor)\", () => pm.expect(pm.response.text()).to.include(\"Meus pets\"));",
+                  "const m = pm.response.text().match(/name=\"_csrf\"[^>]*?(?:value|content)=\"([^\"]+)\"/);",
+                  "pm.test(\"CSRF capturado\", () => pm.expect(m, \"token _csrf não encontrado no HTML\").to.not.be.null);",
+                  "if (m) pm.collectionVariables.set(\"csrf\", m[1]);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                {
+                  "key": "username",
+                  "value": "{{tutorBEmail}}",
+                  "type": "text"
+                },
+                {
+                  "key": "password",
+                  "value": "{{tutorBPassword}}",
+                  "type": "text"
+                },
+                {
+                  "key": "_csrf",
+                  "value": "{{csrf}}",
+                  "type": "text"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "login"
+              ]
+            },
+            "description": "Segue o redirect para /guardian/home e já captura o novo CSRF (ele muda depois do login)."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "06 - Tutor B - Controle (prova que o CSRF está OK)",
+      "item": [
+        {
+          "name": "POST /animals (pet do B)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 201\", () => pm.response.to.have.status(201));",
+                  "pm.collectionVariables.set(\"petB\", pm.response.json().id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "X-CSRF-TOKEN",
+                "value": "{{csrf}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Bidu\",\n  \"species\": \"Cachorro\",\n  \"age\": 3,\n  \"weight\": 12.5\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/animals",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "animals"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "PUT /animals/{{petB}} (próprio pet = 200)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 200\", () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "X-CSRF-TOKEN",
+                "value": "{{csrf}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Bidu Editado\",\n  \"species\": \"Cachorro\",\n  \"age\": 3,\n  \"weight\": 12.5\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/animals/{{petB}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "animals",
+                "{{petB}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "GET /animals (não aparece pet do A)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 200\", () => pm.response.to.have.status(200));",
+                  "const ids = pm.response.json().map(a => a.id);",
+                  "pm.test(\"Pet do A não está na lista\", () => pm.expect(ids).to.not.include(Number(pm.collectionVariables.get(\"petA\"))));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/animals",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "animals"
+              ]
+            }
+          },
+          "response": []
+        }
+      ],
+      "description": "Se o PUT no próprio pet der 200, o token CSRF está certo. Então os 403 da próxima pasta são da checagem de dono."
+    },
+    {
+      "name": "07 - ATAQUE: Tutor B tentando mexer no Tutor A (tudo 403)",
+      "item": [
+        {
+          "name": "GET /animals/{{petA}}",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 403\", () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/animals/{{petA}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "animals",
+                "{{petA}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "PUT /animals/{{petA}}",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 403\", () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "X-CSRF-TOKEN",
+                "value": "{{csrf}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Hackeado\",\n  \"species\": \"Cachorro\",\n  \"age\": 3,\n  \"weight\": 12.5\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/animals/{{petA}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "animals",
+                "{{petA}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "DELETE /animals/{{petA}}",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 403\", () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "X-CSRF-TOKEN",
+                "value": "{{csrf}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/animals/{{petA}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "animals",
+                "{{petA}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "GET /appointments/{{apptA}}",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 403\", () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/appointments/{{apptA}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "appointments",
+                "{{apptA}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "PUT /appointments/{{apptA}}",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 403\", () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "X-CSRF-TOKEN",
+                "value": "{{csrf}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"date\": \"2026-12-10\",\n  \"time\": \"10:00\",\n  \"animalId\": {{petA}},\n  \"clinicId\": {{clinicId}}\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/appointments/{{apptA}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "appointments",
+                "{{apptA}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "PATCH /appointments/{{apptA}}/cancel",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 403\", () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "X-CSRF-TOKEN",
+                "value": "{{csrf}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"reason\": \"Hackeado\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/appointments/{{apptA}}/cancel",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "appointments",
+                "{{apptA}}",
+                "cancel"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "POST /appointments com pet do A",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 403\", () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "X-CSRF-TOKEN",
+                "value": "{{csrf}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"date\": \"2026-12-10\",\n  \"time\": \"10:00\",\n  \"animalId\": {{petA}},\n  \"clinicId\": {{clinicId}}\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/appointments",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "appointments"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "08 - Campos do corpo ignorados (dono e status vêm do servidor)",
+      "item": [
+        {
+          "name": "POST /animals com guardianId do A",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 201\", () => pm.response.to.have.status(201));",
+                  "pm.test(\"Pet NÃO ficou com o tutor A\", () => pm.expect(pm.response.json().guardianId).to.not.eql(Number(pm.collectionVariables.get(\"tutorAId\"))));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "X-CSRF-TOKEN",
+                "value": "{{csrf}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Tentativa\",\n  \"species\": \"Cachorro\",\n  \"age\": 3,\n  \"weight\": 12.5,\n  \"guardianId\": {{tutorAId}}\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/animals",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "animals"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "POST /appointments com status CONCLUIDO",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 201\", () => pm.response.to.have.status(201));",
+                  "pm.test(\"Status ignorado, nasce AGENDADO\", () => pm.expect(pm.response.json().status).to.eql(\"AGENDADO\"));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "X-CSRF-TOKEN",
+                "value": "{{csrf}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"date\": \"2026-12-10\",\n  \"time\": \"10:00\",\n  \"animalId\": {{petB}},\n  \"clinicId\": {{clinicId}},\n  \"status\": \"CONCLUIDO\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/appointments",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "appointments"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8080"
+    },
+    {
+      "key": "tutorAEmail",
+      "value": "tutora@teste.com"
+    },
+    {
+      "key": "tutorAPassword",
+      "value": "1234"
+    },
+    {
+      "key": "tutorBEmail",
+      "value": "tutorb@teste.com"
+    },
+    {
+      "key": "tutorBPassword",
+      "value": "1234"
+    },
+    {
+      "key": "csrf",
+      "value": ""
+    },
+    {
+      "key": "clinicId",
+      "value": ""
+    },
+    {
+      "key": "petA",
+      "value": ""
+    },
+    {
+      "key": "tutorAId",
+      "value": ""
+    },
+    {
+      "key": "petTemp",
+      "value": ""
+    },
+    {
+      "key": "apptA",
+      "value": ""
+    },
+    {
+      "key": "apptExtra",
+      "value": ""
+    },
+    {
+      "key": "petB",
+      "value": ""
+    }
+  ]
+}

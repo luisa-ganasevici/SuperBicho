@@ -260,3 +260,25 @@ O Render builda a imagem a partir do `Dockerfile`. Configure `DB_USER` e `DB_PAS
 
 Os testes de serviço usam JUnit 5 e Mockito. O teste `contextLoads` sobe a aplicação completa e precisa das variáveis `DB_USER` e `DB_PASSWORD`.
 Relatório: `build/reports/tests/test/index.html`.
+
+### Testes da API no Postman
+
+A collection [`docs/SuperBicho.postman_collection.json`](docs/SuperBicho.postman_collection.json) testa a API REST e o controle de acesso por dono, com asserções automáticas em cada requisição.
+
+**Como usar:**
+1. No Postman, clique em **Import** e selecione o arquivo da collection.
+2. Na aba **Variables** da collection, ajuste:
+    - `baseUrl`: `http://localhost:8080` (local) ou `https://superbicho.onrender.com` (online);
+    - `tutorAEmail`, `tutorAPassword`, `tutorBEmail` e `tutorBPassword`: dois tutores de teste.
+3. Garanta que exista pelo menos uma clínica **aprovada** pelo administrador.
+4. Clique nos três pontinhos da collection → **Run collection** → **Run**.
+
+O token CSRF, a sessão e os ids criados são capturados automaticamente.
+
+| Pasta | O que testa | Esperado |
+|---|---|---|
+| 00 | Cadastro dos tutores A e B (opcional) | 200 |
+| 01 – 03 | Tutor A cria, edita e exclui pets; agenda, remarca e cancela consultas | 200 / 201 / 204; 400 ao alterar consulta cancelada |
+| 04 – 06 | Logout do A, login do B e controle: B edita o próprio pet | 200 / 201 |
+| 07 | Tutor B tenta ver, editar, excluir e cancelar dados do Tutor A | **403** em todas |
+| 08 | Envio de `guardianId` e `status` no corpo da requisição | Ignorados: dono e status vêm do servidor |
